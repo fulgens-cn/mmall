@@ -1,6 +1,8 @@
 package cn.fulgens.mmall.pojo;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 public class Category {
     private Integer id;
@@ -13,19 +15,18 @@ public class Category {
 
     private Integer sortOrder;
 
-    private Integer isParent;
+    private List<Category> children;
 
     private Date createTime;
 
     private Date updateTime;
 
-    public Category(Integer id, Integer parentId, String name, Integer status, Integer sortOrder, Integer isParent, Date createTime, Date updateTime) {
+    public Category(Integer id, Integer parentId, String name, Integer status, Integer sortOrder, Date createTime, Date updateTime) {
         this.id = id;
         this.parentId = parentId;
         this.name = name;
         this.status = status;
         this.sortOrder = sortOrder;
-        this.isParent = isParent;
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
@@ -74,12 +75,12 @@ public class Category {
         this.sortOrder = sortOrder;
     }
 
-    public Integer getIsParent() {
-        return isParent;
+    public List<Category> getChildren() {
+        return children;
     }
 
-    public void setIsParent(Integer isParent) {
-        this.isParent = isParent;
+    public void setChildren(List<Category> children) {
+        this.children = children;
     }
 
     public Date getCreateTime() {
@@ -96,5 +97,18 @@ public class Category {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(id, category.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

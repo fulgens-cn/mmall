@@ -82,7 +82,7 @@
             <artifactId>mybatis</artifactId>
             <version>${org.mybatis.version}</version>
         </dependency>
-        <!-- MyBatis pager -->
+        <!-- MyBatis pagerHelper -->
         <dependency>
             <groupId>com.github.miemiedev</groupId>
             <artifactId>mybatis-paginator</artifactId>

@@ -1,6 +1,9 @@
 package cn.fulgens.mmall.dao;
 
 import cn.fulgens.mmall.pojo.Category;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface CategoryMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +17,10 @@ public interface CategoryMapper {
     int updateByPrimaryKeySelective(Category record);
 
     int updateByPrimaryKey(Category record);
+
+    int selectCountByPrimaryKey(Integer id);
+
+    List<Category> selectChildrenByParentId(Integer parentId);
+
+    int checkCategoryExist(@Param("parentId") Integer parentId, @Param("categoryName") String categoryName);
 }

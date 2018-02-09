@@ -4,7 +4,6 @@ import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,8 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@PropertySource(value = {"classpath:datasource.properties"})
-// 相当于<context:property-placeholder location="classpath:db.properties"/>
+@PropertySource(value = {"classpath:jdbc.properties"})
+// 相当于<context:property-placeholder location="classpath:jdbc.properties"/>
 public class DataSourceConfig {
 
     @Autowired

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:charset="UTF-8">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传</title>
+</head>
+<body>
+<form th:method="post" th:action="@{/manage/product/upload.do}"
+      enctype="multipart/form-data" >
+    <input type="file" name="upload_file"><br>
+    <input type="submit" value="点击上传">
+</form>
+
+<form th:method="post" th:action="@{/manage/product/richtext_img_upload.do}"
+      enctype="multipart/form-data" >
+    <input type="file" name="upload_file"><br>
+    <input type="submit" value="模拟富文本上传">
+</form>
+</body>
+</html>

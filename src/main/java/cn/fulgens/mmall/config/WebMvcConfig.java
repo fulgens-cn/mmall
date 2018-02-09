@@ -10,6 +10,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.multipart.MultipartResolver;
@@ -28,6 +29,7 @@ import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +46,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public ITemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver =
                 new SpringResourceTemplateResolver();
-        templateResolver.setPrefix("/templates/");
+        templateResolver.setPrefix("/WEB-INF/templates/");
         templateResolver.setSuffix(".html");
         // 设置templateMode属性为HTML5
         templateResolver.setTemplateMode("HTML5");
@@ -82,6 +84,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public ViewResolver viewResolver(TemplateEngine templateEngine) {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine);
+        viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
     }
 
@@ -142,11 +145,22 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
         // 创建fastjson提供的消息转换器FastJsonHttpMessageConverter
         FastJsonHttpMessageConverter messageConverter = new FastJsonHttpMessageConverter();
-        // 创建fastjson配置对象FastJsonConfig，设置格式化json数据
+        // 创建fastjson配置对象FastJsonConfig
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+        // 设置格式化json数据
+        // fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+        /* WriteNullNumberAsZero—-数值字段如果为null,输出为0,而非null
+         WriteNullListAsEmpty—–List字段如果为null,输出为[],而非null
+         WriteNullStringAsEmpty—字符类型字段如果为null,输出为"",而非null
+         WriteNullBooleanAsFalse–Boolean字段如果为null,输出为false,而非null*/
+        // 设置输出值为null的字段,默认为false
+        // fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue);
         // 为消息转换器设置配置
         messageConverter.setFastJsonConfig(fastJsonConfig);
+        // 配置支持的MediaType
+        List<MediaType> mediaTypeList = new ArrayList<>();
+        mediaTypeList.add(MediaType.APPLICATION_JSON_UTF8);
+        messageConverter.setSupportedMediaTypes(mediaTypeList);
         // 添加fastjson消息转换器到转换器列表中
         converters.add(messageConverter);
     }
