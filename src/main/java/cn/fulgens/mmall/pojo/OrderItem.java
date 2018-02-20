@@ -12,7 +12,7 @@ public class OrderItem {
 
     private Integer productId;
 
-    private String productTitle;
+    private String productName;
 
     private String productImage;
 
@@ -26,12 +26,12 @@ public class OrderItem {
 
     private Date updateTime;
 
-    public OrderItem(Integer id, Integer userId, Long orderNo, Integer productId, String productTitle, String productImage, BigDecimal productPrice, Integer quantity, BigDecimal totalPrice, Date createTime, Date updateTime) {
+    public OrderItem(Integer id, Integer userId, Long orderNo, Integer productId, String productName, String productImage, BigDecimal productPrice, Integer quantity, BigDecimal totalPrice, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.orderNo = orderNo;
         this.productId = productId;
-        this.productTitle = productTitle;
+        this.productName = productName;
         this.productImage = productImage;
         this.productPrice = productPrice;
         this.quantity = quantity;
@@ -76,12 +76,12 @@ public class OrderItem {
         this.productId = productId;
     }
 
-    public String getProductTitle() {
-        return productTitle;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductTitle(String productTitle) {
-        this.productTitle = productTitle == null ? null : productTitle.trim();
+    public void setProductName(String productName) {
+        this.productName = productName == null ? null : productName.trim();
     }
 
     public String getProductImage() {

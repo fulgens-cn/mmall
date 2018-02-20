@@ -165,4 +165,12 @@
     FROM tb_cart
     WHERE user_id = #{userId}
   </select>
+
+  <select id="selectCheckedByUserId" resultMap="BaseResultMap" parameterType="int">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM tb_cart
+    WHERE user_id = #{userId}
+    AND checked = '1'
+  </select>
 </mapper>

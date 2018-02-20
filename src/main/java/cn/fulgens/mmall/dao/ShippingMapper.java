@@ -1,8 +1,12 @@
 package cn.fulgens.mmall.dao;
 
 import cn.fulgens.mmall.pojo.Shipping;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ShippingMapper {
+
     int deleteByPrimaryKey(Integer id);
 
     int insert(Shipping record);
@@ -14,4 +18,13 @@ public interface ShippingMapper {
     int updateByPrimaryKeySelective(Shipping record);
 
     int updateByPrimaryKey(Shipping record);
+
+    int deleteByIdAndUserId(@Param("userId") Integer userId, @Param("shippingId") Integer shippingId);
+
+    int updateByShipping(Shipping record);
+
+    Shipping selectByIdAndUserId(@Param("userId") Integer userId, @Param("shippingId") Integer shippingId);
+
+    List<Shipping> selectByUserId(@Param("userId") Integer userId);
+
 }

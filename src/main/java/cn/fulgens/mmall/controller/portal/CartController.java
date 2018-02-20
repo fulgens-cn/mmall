@@ -38,7 +38,7 @@ public class CartController {
     }
 
     @RequestMapping(value = "delete_product.do")
-    public ServerResponse<CartVo> delete(HttpSession session, String productIds) {
+    public ServerResponse<CartVo> deleteProduct(HttpSession session, String productIds) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());

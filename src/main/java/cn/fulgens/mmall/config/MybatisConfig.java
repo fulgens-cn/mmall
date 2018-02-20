@@ -5,9 +5,12 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -21,11 +24,8 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement    // 启用事务管理器
-// @PropertySource(value = {"classpath:mybatis.properties"})
+@PropertySource(value = {"classpath:mybatis.properties"})
 public class MybatisConfig {
-
-    @Autowired
-    private Environment env;
 
     // 配置SqlSessionFactoryBean
     @Bean

@@ -11,6 +11,8 @@ public class Shipping {
 
     private String receiverPhone;
 
+    private String receiverMobile;
+
     private String receiverProvince;
 
     private String receiverCity;
@@ -25,11 +27,12 @@ public class Shipping {
 
     private Date updateTime;
 
-    public Shipping(Integer id, Integer userId, String receiverName, String receiverPhone, String receiverProvince, String receiverCity, String receiverDistrict, String receiverAddress, String receiverZip, Date createTime, Date updateTime) {
+    public Shipping(Integer id, Integer userId, String receiverName, String receiverPhone, String receiverMobile, String receiverProvince, String receiverCity, String receiverDistrict, String receiverAddress, String receiverZip, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.receiverName = receiverName;
         this.receiverPhone = receiverPhone;
+        this.receiverMobile = receiverMobile;
         this.receiverProvince = receiverProvince;
         this.receiverCity = receiverCity;
         this.receiverDistrict = receiverDistrict;
@@ -73,6 +76,14 @@ public class Shipping {
 
     public void setReceiverPhone(String receiverPhone) {
         this.receiverPhone = receiverPhone == null ? null : receiverPhone.trim();
+    }
+
+    public String getReceiverMobile() {
+        return receiverMobile;
+    }
+
+    public void setReceiverMobile(String receiverMobile) {
+        this.receiverMobile = receiverMobile == null ? null : receiverMobile.trim();
     }
 
     public String getReceiverProvince() {

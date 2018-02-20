@@ -29,17 +29,17 @@ public class DataSourceConfig {
         dataSource.setUsername(env.getProperty("jdbc.username"));
         dataSource.setPassword(env.getProperty("jdbc.password"));
         // 配置初始化连接数
-        dataSource.setInitialSize(Integer.valueOf(env.getProperty("jdbc.initialSize")));
+        dataSource.setInitialSize(env.getProperty("jdbc.initialSize", Integer.class));
         // 配置最小空闲连接
-        dataSource.setMinIdle(Integer.valueOf(env.getProperty("jdbc.minIdle")));
+        dataSource.setMinIdle(env.getProperty("jdbc.minIdle", Integer.class));
         // 配置最大连接数量
-        dataSource.setMaxActive(Integer.valueOf(env.getProperty("jdbc.maxActive")));
+        dataSource.setMaxActive(env.getProperty("jdbc.maxActive", Integer.class));
         // 配置获取连接超时等待的时间
-        dataSource.setMaxWait(Long.valueOf(env.getProperty("jdbc.maxWait")));
+        dataSource.setMaxWait(env.getProperty("jdbc.maxWait", Long.class));
         // 配置间隔多久才进行一次检测，检测需要关闭的空闲连接
-        dataSource.setTimeBetweenEvictionRunsMillis(Long.valueOf(env.getProperty("jdbc.timeBetweenEvictionRunsMillis")));
+        dataSource.setTimeBetweenEvictionRunsMillis(env.getProperty("jdbc.timeBetweenEvictionRunsMillis", Long.class));
         // 配置一个连接在池中最小生存的时间
-        dataSource.setMinEvictableIdleTimeMillis(Long.valueOf(env.getProperty("jdbc.minEvictableIdleTimeMillis")));
+        dataSource.setMinEvictableIdleTimeMillis(env.getProperty("jdbc.minEvictableIdleTimeMillis", Long.class));
         return dataSource;
     }
 
