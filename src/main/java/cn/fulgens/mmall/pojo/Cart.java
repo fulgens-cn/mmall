@@ -1,6 +1,7 @@
 package cn.fulgens.mmall.pojo;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Cart {
     private Integer id;
@@ -86,4 +87,5 @@ public class Cart {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
+
 }
