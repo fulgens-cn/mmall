@@ -7,9 +7,6 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# kdiff3 ignore
-*.orig
-
 # Maven ignore
 target/
 

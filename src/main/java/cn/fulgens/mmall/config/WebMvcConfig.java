@@ -136,7 +136,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return multipartResolver;
     }
 
-    // 重写configureMessageConverters方法使用jastjson作为json数据的消息转换器
+    // 重写configureMessageConverters方法使用fastjson作为json数据的消息转换器
     // Fastjson 版本小于1.2.36，在与Spring MVC 4.X 版本集成时需使用 FastJsonHttpMessageConverter4
     // 参考：https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson
     @Override
