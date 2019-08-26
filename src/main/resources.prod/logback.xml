@@ -42,7 +42,6 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <filter class=""
     </appender>
 
     <logger name="cn.fulgens.mmall" additivity="false" level="INFO" >

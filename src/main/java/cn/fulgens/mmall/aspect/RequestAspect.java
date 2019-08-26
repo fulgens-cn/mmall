@@ -1,5 +1,6 @@
 package cn.fulgens.mmall.aspect;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,41 +15,42 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @Aspect
 @Component
 public class RequestAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(RequestAspect.class);
-
-    // 定义切点
-    @Pointcut("execution(* cn.fulgens.mmall.controller.*(..))")
-    public void log() {}
+    /**
+     * 定义切点
+     */
+    @Pointcut("execution(* cn.fulgens.mmall.controller..*.*(..))")
+    public void logRequestInfo() {}
 
     /**
      * 记录每次请求信息到日志
      */
-    @Before("log()")
+    @Before("logRequestInfo()")
     public void logRequestInfo(JoinPoint joinPoint) {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
         // request url
-        logger.info("request url = {}", request.getRequestURL());
+        log.info("request url = {}", request.getRequestURL());
         // request method
-        logger.info("request method = {}", request.getMethod());
+        log.info("request method = {}", request.getMethod());
         // request server ip
-        logger.info("request server ip = {}", request.getRemoteAddr());
+        log.info("request server ip = {}", request.getRemoteAddr());
         // request class method
-        logger.info("request class method = {}", joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
+        log.info("request class method = {}", joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
         // request args
-        logger.info("request args = {}", joinPoint.getArgs());
+        log.info("request args = {}", joinPoint.getArgs());
     }
 
     /**
      * 记录每次响应信息到日志
      */
-    @AfterReturning(returning = "object", value = "log()")
+    @AfterReturning(returning = "object", value = "logRequestInfo()")
     public void logServerResponse(Object object) {
-        logger.info("response = {}", object.toString());
+        log.info("response = {}", object.toString());
     }
 
 }
