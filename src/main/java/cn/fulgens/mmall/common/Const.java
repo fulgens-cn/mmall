@@ -14,7 +14,8 @@ public class Const {
 
     public static final String CURRENT_USER = "currentUser";
 
-    public static final String USERANME = "username";
+    public static final String USERNAME = "username";
+
     public static final String EMAIL = "email";
 
     public static final Set<String> orderBySet = Sets.newHashSet("price_desc", "price_asc");
@@ -107,8 +108,6 @@ public class Const {
         String RESPONSE_SUCCESS = "success";
         String RESPONSE_FAILED = "failed";
     }
-
-
 
     public enum PayPlatformEnum{
         ALIPAY(1,"支付宝");

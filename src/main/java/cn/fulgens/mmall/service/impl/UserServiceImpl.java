@@ -3,7 +3,6 @@ package cn.fulgens.mmall.service.impl;
 import cn.fulgens.mmall.common.Const;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.common.TokenCache;
 import cn.fulgens.mmall.dao.UserMapper;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
@@ -17,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @Author: fulgens
@@ -29,6 +28,8 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserServiceImpl implements IUserService {
+
+    private static final String FORGET_PASSWORD_TOKEN_PREFIX = "forget_password_token_";
 
     @Autowired
     private RedisUtil redisUtil;
@@ -61,14 +62,14 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.errorWithMsg("用户未登录无法退出登陆");
         }
         CookieUtil.delLoginToken(request, response);
-        redisUtil.delete(token);
+        RedisUtil.delete(token);
         return ServerResponse.successWithMsg("退出登陆成功");
     }
 
     @Override
     public ServerResponse<String> register(User user) {
         // 校验用户名是否已经存在
-        ServerResponse<String> checkValid = checkValid(user.getUsername(), Const.USERANME);
+        ServerResponse<String> checkValid = checkValid(user.getUsername(), Const.USERNAME);
         if (!checkValid.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名已存在");
         }
@@ -92,7 +93,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> checkValid(String str, String type) {
         if (StringUtils.isNotBlank(type)) {
-            if (type.equals(Const.USERANME)) {
+            if (type.equals(Const.USERNAME)) {
                 // 校验用户名是否已经存在
                 int count = userMapper.selectCountByUsername(str);
                 if (count > 0) {
@@ -115,7 +116,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> getQuestionByUsername(String username) {
         // 校验用户名是否存在
-        ServerResponse<String> validResponse = checkValid(username, Const.USERANME);
+        ServerResponse<String> validResponse = checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名不存在");
         }
@@ -129,7 +130,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
         // 校验用户名是否存在
-        ServerResponse<String> validResponse = checkValid(username, Const.USERANME);
+        ServerResponse<String> validResponse = checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名不存在");
         }
@@ -138,7 +139,7 @@ public class UserServiceImpl implements IUserService {
         if (count > 0) {
             // 用户提交的忘记密码问题答案正确
             String token = UUID.randomUUID().toString();
-            TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, token);
+            RedisUtil.setEx(FORGET_PASSWORD_TOKEN_PREFIX + username, token, 1, TimeUnit.HOURS);
             return ServerResponse.successWithData(token);
         }
         return ServerResponse.errorWithMsg("问题答案错误");
@@ -147,14 +148,14 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
         // 校验用户名是否存在
-        ServerResponse<String> validResponse = checkValid(username, Const.USERANME);
+        ServerResponse<String> validResponse = checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名不存在");
         }
         if (StringUtils.isBlank(forgetToken)) {
             return ServerResponse.errorWithMsg("参数错误，token不能为空");
         }
-        String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);
+        String token = RedisUtil.get(FORGET_PASSWORD_TOKEN_PREFIX + username);
         if (StringUtils.isBlank(token)) {
             return ServerResponse.errorWithMsg("token无效或已过期");
         }
