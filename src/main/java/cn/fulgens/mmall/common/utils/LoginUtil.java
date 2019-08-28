@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.utils;
+package cn.fulgens.mmall.common.utils;
 
 import cn.fulgens.mmall.pojo.User;
 import org.apache.commons.lang3.StringUtils;

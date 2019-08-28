@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.utils;
+package cn.fulgens.mmall.common.utils;
 
 import java.security.MessageDigest;
 

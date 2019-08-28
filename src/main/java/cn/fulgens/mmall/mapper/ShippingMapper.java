@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.dao;
+package cn.fulgens.mmall.mapper;
 
 import cn.fulgens.mmall.pojo.Shipping;
 import org.apache.ibatis.annotations.Param;

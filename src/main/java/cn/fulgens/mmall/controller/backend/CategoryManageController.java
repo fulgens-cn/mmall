@@ -1,18 +1,16 @@
 package cn.fulgens.mmall.controller.backend;
 
-import cn.fulgens.mmall.common.Const;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.Category;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.ICategoryService;
 import cn.fulgens.mmall.service.IUserService;
-import cn.fulgens.mmall.utils.LoginUtil;
+import cn.fulgens.mmall.common.utils.LoginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**

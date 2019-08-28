@@ -1,11 +1,11 @@
 package cn.fulgens.mmall.controller.portal;
 
-import cn.fulgens.mmall.common.Const;
+import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IOrderService;
-import cn.fulgens.mmall.utils.LoginUtil;
+import cn.fulgens.mmall.common.utils.LoginUtil;
 import cn.fulgens.mmall.vo.OrderProductVo;
 import cn.fulgens.mmall.vo.OrderVo;
 import com.alipay.api.AlipayApiException;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.Set;
 
@@ -161,13 +160,13 @@ public class OrderController {
                 // 通知数据正确
                 ServerResponse serverResponse = orderService.doAlipayNotify(params);
                 if (serverResponse.isSuccess()) {
-                    return Const.AlipayCallback.RESPONSE_SUCCESS;
+                    return Constants.AlipayCallback.RESPONSE_SUCCESS;
                 }
             }
         } catch (AlipayApiException e) {
             logger.error("支付宝签证签名异常", e);
         }
-        return Const.AlipayCallback.RESPONSE_FAILED;
+        return Constants.AlipayCallback.RESPONSE_FAILED;
     }
 
     /**

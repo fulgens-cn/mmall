@@ -1,7 +1,7 @@
 package cn.fulgens.mmall.service.impl;
 
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.dao.CategoryMapper;
+import cn.fulgens.mmall.mapper.CategoryMapper;
 import cn.fulgens.mmall.pojo.Category;
 import cn.fulgens.mmall.service.ICategoryService;
 import com.google.common.collect.Lists;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

@@ -1,15 +1,15 @@
 package cn.fulgens.mmall.service.impl;
 
-import cn.fulgens.mmall.common.Const;
+import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.dao.*;
+import cn.fulgens.mmall.mapper.*;
 import cn.fulgens.mmall.pojo.*;
 import cn.fulgens.mmall.service.IOrderService;
-import cn.fulgens.mmall.utils.BigDecimalUtil;
-import cn.fulgens.mmall.utils.DateTimeUtil;
-import cn.fulgens.mmall.utils.FTPUtil;
-import cn.fulgens.mmall.utils.PropertiesUtil;
+import cn.fulgens.mmall.common.utils.BigDecimalUtil;
+import cn.fulgens.mmall.common.utils.DateTimeUtil;
+import cn.fulgens.mmall.common.utils.FTPUtil;
+import cn.fulgens.mmall.common.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.OrderItemVo;
 import cn.fulgens.mmall.vo.OrderProductVo;
 import cn.fulgens.mmall.vo.OrderVo;
@@ -102,9 +102,9 @@ public class OrderServiceImpl implements IOrderService {
         // 设置订单所属用户id
         order.setUserId(userId);
         // 设置订单状态为未付款状态
-        order.setStatus(Const.OrderStatusEnum.NO_PAY.getCode());
+        order.setStatus(Constants.OrderStatusEnum.NO_PAY.getCode());
         // 社会自订单支付类型为在线支付
-        order.setPaymentType(Const.PaymentTypeEnum.ONLINE_PAY.getCode());
+        order.setPaymentType(Constants.PaymentTypeEnum.ONLINE_PAY.getCode());
         // 设置订单邮费为0元
         order.setPostage(BigDecimal.ZERO);
         // 设置订单收货地址id
@@ -129,13 +129,13 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.errorWithMsg("该用户不存在编号为" + orderNo + "的相应订单");
         }
         // 校验订单状态
-        if (order.getStatus() != Const.OrderStatusEnum.NO_PAY.getCode()) {
+        if (order.getStatus() != Constants.OrderStatusEnum.NO_PAY.getCode()) {
             return ServerResponse.errorWithMsg("订单已支付，无法取消");
         }
         // 更新订单状态为已取消
         Order updateOrder = new Order();
         updateOrder.setId(order.getId());
-        updateOrder.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
+        updateOrder.setStatus(Constants.OrderStatusEnum.CANCELED.getCode());
         int rowCount = orderMapper.updateByPrimaryKeySelective(order);
         if (rowCount > 0) {
             return ServerResponse.success();
@@ -232,12 +232,12 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.errorWithMsg("不存在此订单，请核对订单号");
         }
         // 校验订单状态
-        if (order.getStatus() < Const.OrderStatusEnum.PAID.getCode()) {
+        if (order.getStatus() < Constants.OrderStatusEnum.PAID.getCode()) {
             return ServerResponse.errorWithMsg("订单尚未完成支付，无法发货");
         }
-        if (order.getStatus() == Const.OrderStatusEnum.PAID.getCode()) {
+        if (order.getStatus() == Constants.OrderStatusEnum.PAID.getCode()) {
             // 更新订单状态为已发货
-            order.setStatus(Const.OrderStatusEnum.SHIPPED.getCode());
+            order.setStatus(Constants.OrderStatusEnum.SHIPPED.getCode());
             orderMapper.updateByPrimaryKeySelective(order);
             return ServerResponse.successWithMsg("发货成功");
         }
@@ -271,7 +271,7 @@ public class OrderServiceImpl implements IOrderService {
         for (Cart cart : cartList) {
             // 校验产品销售状态
             Product product = productMapper.selectByPrimaryKey(cart.getProductId());
-            if (product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+            if (product.getStatus() != Constants.ProductStatusEnum.ON_SALE.getCode()) {
                 return ServerResponse.errorWithMsg("产品" + product.getName() +"已下架或已删除,下单失败");
             }
             // 校验产品库存是否充足
@@ -323,11 +323,11 @@ public class OrderServiceImpl implements IOrderService {
         orderVo.setOrderNo(order.getOrderNo());
         orderVo.setPayment(order.getPayment());
         orderVo.setPaymentType(order.getPaymentType());
-        orderVo.setPaymentTypeDesc(Const.PaymentTypeEnum.codeOf(order.getPaymentType()).getValue());
+        orderVo.setPaymentTypeDesc(Constants.PaymentTypeEnum.codeOf(order.getPaymentType()).getValue());
 
         orderVo.setPostage(order.getPostage());
         orderVo.setStatus(order.getStatus());
-        orderVo.setStatusDesc(Const.OrderStatusEnum.codeOf(order.getStatus()).getValue());
+        orderVo.setStatusDesc(Constants.OrderStatusEnum.codeOf(order.getStatus()).getValue());
 
         orderVo.setShippingId(order.getShippingId());
         Shipping shipping = shippingMapper.selectByPrimaryKey(order.getShippingId());
@@ -527,19 +527,19 @@ public class OrderServiceImpl implements IOrderService {
         String tradeNo = params.get("trade_no");
         String tradeStatus = params.get("trade_status");
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order.getStatus() >= Const.OrderStatusEnum.PAID.getCode()){
+        if(order.getStatus() >= Constants.OrderStatusEnum.PAID.getCode()){
             return ServerResponse.successWithMsg("支付宝重复调用");
         }
-        if(Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)){
+        if(Constants.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)){
             order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));
-            order.setStatus(Const.OrderStatusEnum.PAID.getCode());
+            order.setStatus(Constants.OrderStatusEnum.PAID.getCode());
             orderMapper.updateByPrimaryKeySelective(order);
         }
 
         PayInfo payInfo = new PayInfo();
         payInfo.setUserId(order.getUserId());
         payInfo.setOrderNo(order.getOrderNo());
-        payInfo.setPayPlatform(Const.PayPlatformEnum.ALIPAY.getCode());
+        payInfo.setPayPlatform(Constants.PayPlatformEnum.ALIPAY.getCode());
         payInfo.setPlatformNumber(tradeNo);
         payInfo.setPlatformStatus(tradeStatus);
 
@@ -554,7 +554,7 @@ public class OrderServiceImpl implements IOrderService {
         if (order == null) {
             return ServerResponse.errorWithMsg("系统中未查询到该用户编号为" + orderNo + "的订单记录");
         }
-        if (order.getStatus() > Const.OrderStatusEnum.PAID.getCode()) {
+        if (order.getStatus() > Constants.OrderStatusEnum.PAID.getCode()) {
             return ServerResponse.success();
         }
         return ServerResponse.error();

@@ -1,16 +1,16 @@
 package cn.fulgens.mmall.service.impl;
 
-import cn.fulgens.mmall.common.Const;
+import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.dao.CategoryMapper;
-import cn.fulgens.mmall.dao.ProductMapper;
+import cn.fulgens.mmall.mapper.CategoryMapper;
+import cn.fulgens.mmall.mapper.ProductMapper;
 import cn.fulgens.mmall.pojo.Category;
 import cn.fulgens.mmall.pojo.Product;
 import cn.fulgens.mmall.service.ICategoryService;
 import cn.fulgens.mmall.service.IProductService;
-import cn.fulgens.mmall.utils.DateTimeUtil;
-import cn.fulgens.mmall.utils.PropertiesUtil;
+import cn.fulgens.mmall.common.utils.DateTimeUtil;
+import cn.fulgens.mmall.common.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.ProductDetailVo;
 import cn.fulgens.mmall.vo.ProductListVo;
 import com.github.pagehelper.PageHelper;
@@ -177,7 +177,7 @@ public class ProductServiceImpl implements IProductService {
             return ServerResponse.errorWithMsg(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         Product product = productMapper.selectByPrimaryKey(productId);
-        if (product == null || product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+        if (product == null || product.getStatus() != Constants.ProductStatusEnum.ON_SALE.getCode()) {
             return ServerResponse.errorWithMsg("产品已下架或已删除");
         }
         ProductDetailVo productDetailVo = assembleProductDetailVo(product);
@@ -207,7 +207,7 @@ public class ProductServiceImpl implements IProductService {
         PageHelper pageHelper = new PageHelper();
         pageHelper.startPage(pageNum, pageSize);
         if (orderBy != null) {
-            if (Const.orderBySet.contains(orderBy)) {
+            if (Constants.orderBySet.contains(orderBy)) {
                 String[] split = orderBy.split("_");
                 pageHelper.orderBy(split[0] + " " + split[1]);
             }

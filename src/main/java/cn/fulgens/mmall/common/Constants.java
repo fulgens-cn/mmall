@@ -10,7 +10,7 @@ import java.util.Set;
 * @Date: Created in 2018/2/4 23:04
 * @Modified by:
 */
-public class Const {
+public class Constants {
 
     public static final String CURRENT_USER = "currentUser";
 

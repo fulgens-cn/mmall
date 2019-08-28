@@ -59,7 +59,7 @@
                 type="XMLMAPPER",生成SQLMap XML文件和独立的Mapper接口
         -->
         <!-- targetPackage：mapper接口dao生成的位置 -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="cn.fulgens.mmall.dao"
+        <javaClientGenerator type="XMLMAPPER" targetPackage="cn.fulgens.mmall.mapper"
                              targetProject="./src/main/java">
             <!-- enableSubPackages:是否让schema作为包的后缀 -->
             <property name="enableSubPackages" value="false" />

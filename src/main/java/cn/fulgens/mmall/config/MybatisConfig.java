@@ -22,12 +22,22 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * MyBatis配置类
+ *
+ * @author fulgens
+ */
 @Configuration
-@EnableTransactionManagement    // 启用事务管理器
+@EnableTransactionManagement
 @PropertySource(value = {"classpath:mybatis.properties"})
 public class MybatisConfig {
 
-    // 配置SqlSessionFactoryBean
+    /**
+     * 配置SqlSessionFactoryBean
+     * @param dataSource
+     * @param pageHelper
+     * @return
+     */
     @Bean
     public SqlSessionFactoryBean sqlSessionFactoryBean(DataSource dataSource,
                                                        PageHelper pageHelper) {
@@ -60,16 +70,23 @@ public class MybatisConfig {
         return pageHelper;
     }
 
-    // 配置Mapper接口扫描
+    /**
+     * 配置Mapper接口扫描
+     * @return
+     */
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer =
                 new MapperScannerConfigurer();
-        mapperScannerConfigurer.setBasePackage("cn.fulgens.mmall.dao");
+        mapperScannerConfigurer.setBasePackage("cn.fulgens.mmall.mapper");
         return mapperScannerConfigurer;
     }
 
-    // 配置事务管理器
+    /**
+     * 配置事务管理器
+     * @param dataSource
+     * @return
+     */
     @Bean
     public DataSourceTransactionManager dataSourceTransactionManager(DataSource dataSource) {
         DataSourceTransactionManager dataSourceTransactionManager =

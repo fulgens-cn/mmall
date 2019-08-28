@@ -1,6 +1,6 @@
 package cn.fulgens.mmall.config;
 
-import cn.fulgens.mmall.filter.SessionExpireFilter;
+import cn.fulgens.mmall.common.filter.SessionExpireFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 

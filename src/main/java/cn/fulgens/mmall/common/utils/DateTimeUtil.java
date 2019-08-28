@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.utils;
+package cn.fulgens.mmall.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;

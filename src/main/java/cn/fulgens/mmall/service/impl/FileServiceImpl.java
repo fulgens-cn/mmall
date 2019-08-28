@@ -1,8 +1,7 @@
 package cn.fulgens.mmall.service.impl;
 
 import cn.fulgens.mmall.service.IFileService;
-import cn.fulgens.mmall.utils.FTPUtil;
-import com.google.common.collect.Lists;
+import cn.fulgens.mmall.common.utils.FTPUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

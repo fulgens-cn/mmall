@@ -1,14 +1,14 @@
 package cn.fulgens.mmall.service.impl;
 
-import cn.fulgens.mmall.common.Const;
+import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.dao.CartMapper;
-import cn.fulgens.mmall.dao.ProductMapper;
+import cn.fulgens.mmall.mapper.CartMapper;
+import cn.fulgens.mmall.mapper.ProductMapper;
 import cn.fulgens.mmall.pojo.Cart;
 import cn.fulgens.mmall.pojo.Product;
 import cn.fulgens.mmall.service.ICartService;
-import cn.fulgens.mmall.utils.BigDecimalUtil;
+import cn.fulgens.mmall.common.utils.BigDecimalUtil;
 import cn.fulgens.mmall.vo.CartProductVo;
 import cn.fulgens.mmall.vo.CartVo;
 import com.google.common.base.Splitter;
@@ -37,7 +37,7 @@ public class CartServiceImpl implements ICartService {
             return ServerResponse.errorWithMsg(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         Product product = productMapper.selectByPrimaryKey(productId);
-        if (product == null || product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+        if (product == null || product.getStatus() != Constants.ProductStatusEnum.ON_SALE.getCode()) {
             return ServerResponse.errorWithMsg("产品已下架或已删除");
         }
         Cart cart = cartMapper.selectByUserIdAndProductId(userId, productId);
@@ -47,13 +47,13 @@ public class CartServiceImpl implements ICartService {
             cart.setUserId(userId);
             cart.setProductId(productId);
             cart.setQuantity(count);
-            cart.setChecked(Const.Cart.CHECKED);
+            cart.setChecked(Constants.Cart.CHECKED);
             // 插入数据
             cartMapper.insert(cart);
         }else {
             // 购物车中已存在属于userId用户的productId对应产品,合并购买数量
             cart.setQuantity(cart.getQuantity() + count);
-            cart.setChecked(Const.Cart.CHECKED);
+            cart.setChecked(Constants.Cart.CHECKED);
             // 更新购买数量
             cartMapper.updateByPrimaryKeySelective(cart);
         }
@@ -101,9 +101,9 @@ public class CartServiceImpl implements ICartService {
             return ServerResponse.errorWithMsg(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         if (checked) {
-            cartMapper.checkedOrUnCheckedByUserId(userId, Const.Cart.CHECKED, productId);
+            cartMapper.checkedOrUnCheckedByUserId(userId, Constants.Cart.CHECKED, productId);
         } else {
-            cartMapper.checkedOrUnCheckedByUserId(userId, Const.Cart.UN_CHECKED, productId);
+            cartMapper.checkedOrUnCheckedByUserId(userId, Constants.Cart.UN_CHECKED, productId);
         }
         return getProductListInCart(userId);
     }
@@ -148,14 +148,14 @@ public class CartServiceImpl implements ICartService {
                     if (product.getStock() < buyNum) {
                         // 库存不足
                         buyNum = product.getStock();
-                        cartProductVo.setLimitQuantity(Const.Cart.LIMIT_NUM_FAIL);
+                        cartProductVo.setLimitQuantity(Constants.Cart.LIMIT_NUM_FAIL);
                         // 更新用户购买数量
                         Cart cartForQuantity = new Cart();
                         cartForQuantity.setId(cart.getId());
                         cartForQuantity.setQuantity(buyNum);
                         cartMapper.updateByPrimaryKeySelective(cartForQuantity);
                     }else {
-                        cartProductVo.setLimitQuantity(Const.Cart.LIMIT_NUM_SUCCESS);
+                        cartProductVo.setLimitQuantity(Constants.Cart.LIMIT_NUM_SUCCESS);
                     }
                     cartProductVo.setQuantity(buyNum);
                     cartProductVo.setProductChecked(cart.getChecked());
@@ -163,7 +163,7 @@ public class CartServiceImpl implements ICartService {
                     cartProductVo.setProductTotalPrice(BigDecimalUtil.mul(product.getPrice().doubleValue(), cartProductVo.getQuantity()));
                 }
                 // 计算购物车总价
-                if (cart.getChecked() == Const.Cart.CHECKED) {
+                if (cart.getChecked() == Constants.Cart.CHECKED) {
                     cartTotalPrice = BigDecimalUtil.add(cartTotalPrice.doubleValue(), cartProductVo.getProductTotalPrice().doubleValue());
                 }
                 cartProductVoList.add(cartProductVo);

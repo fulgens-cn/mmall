@@ -1,12 +1,11 @@
 package cn.fulgens.mmall.controller.backend;
 
-import cn.fulgens.mmall.common.Const;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IOrderService;
 import cn.fulgens.mmall.service.IUserService;
-import cn.fulgens.mmall.utils.LoginUtil;
+import cn.fulgens.mmall.common.utils.LoginUtil;
 import cn.fulgens.mmall.vo.OrderVo;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping(value = "/manage/order/")

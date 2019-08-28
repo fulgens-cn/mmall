@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.utils;
+package cn.fulgens.mmall.common.utils;
 
 import cn.fulgens.mmall.pojo.User;
 import com.fasterxml.jackson.annotation.JsonInclude;

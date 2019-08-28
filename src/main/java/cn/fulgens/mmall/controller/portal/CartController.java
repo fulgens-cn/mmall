@@ -1,18 +1,16 @@
 package cn.fulgens.mmall.controller.portal;
 
-import cn.fulgens.mmall.common.Const;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.ICartService;
-import cn.fulgens.mmall.utils.LoginUtil;
+import cn.fulgens.mmall.common.utils.LoginUtil;
 import cn.fulgens.mmall.vo.CartVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping(value = "/cart/")

@@ -2,7 +2,7 @@ package cn.fulgens.mmall.service.impl;
 
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.dao.ShippingMapper;
+import cn.fulgens.mmall.mapper.ShippingMapper;
 import cn.fulgens.mmall.pojo.Shipping;
 import cn.fulgens.mmall.service.IShippingService;
 import com.github.pagehelper.PageHelper;

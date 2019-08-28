@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cn.fulgens.mmall.dao.UserMapper" >
+<mapper namespace="cn.fulgens.mmall.mapper.UserMapper" >
   <resultMap id="BaseResultMap" type="cn.fulgens.mmall.pojo.User" >
     <constructor >
       <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />

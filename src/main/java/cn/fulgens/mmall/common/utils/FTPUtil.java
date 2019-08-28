@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.utils;
+package cn.fulgens.mmall.common.utils;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;

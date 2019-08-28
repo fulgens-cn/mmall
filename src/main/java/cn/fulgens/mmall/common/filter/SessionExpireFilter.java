@@ -1,9 +1,9 @@
-package cn.fulgens.mmall.filter;
+package cn.fulgens.mmall.common.filter;
 
 import cn.fulgens.mmall.pojo.User;
-import cn.fulgens.mmall.utils.CookieUtil;
-import cn.fulgens.mmall.utils.JsonUtil;
-import cn.fulgens.mmall.utils.RedisUtil;
+import cn.fulgens.mmall.common.utils.CookieUtil;
+import cn.fulgens.mmall.common.utils.JsonUtil;
+import cn.fulgens.mmall.common.utils.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.*;

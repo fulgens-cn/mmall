@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ComponentScan(basePackages = {"cn.fulgens.mmall"}, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ANNOTATION, value = EnableWebMvc.class)
 })
-@Import({DataSourceConfig.class, MybatisConfig.class, RedisConfig.class, AliPayConfig.class})
+@Import({DataSourceConfig.class, MybatisConfig.class, RedisConfig.class, AliPayConfig.class, AopConfig.class})
 @PropertySource(value = {"classpath:mmall.properties"})
 public class RootConfig {
 

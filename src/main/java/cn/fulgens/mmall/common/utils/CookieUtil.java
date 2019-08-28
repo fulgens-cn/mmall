@@ -1,4 +1,4 @@
-package cn.fulgens.mmall.utils;
+package cn.fulgens.mmall.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Cookie工具类
@@ -24,8 +23,8 @@ public class CookieUtil {
     private final static String COOKIE_NAME_TOKEN = "token";
 
     public static String readLoginToken(HttpServletRequest request) {
-        List<Cookie> cookies = Arrays.asList(request.getCookies());
-        if (!CollectionUtils.isEmpty(cookies)) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
                 log.info("read cookieName: {}, cookieValue: {}", cookie.getName(), cookie.getValue());
                 if (StringUtils.equals(cookie.getName(), COOKIE_NAME_TOKEN)) {
@@ -50,8 +49,8 @@ public class CookieUtil {
     }
 
     public static void delLoginToken(HttpServletRequest request, HttpServletResponse response) {
-        List<Cookie> cookies = Arrays.asList(request.getCookies());
-        if (!CollectionUtils.isEmpty(cookies)) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
                 if (StringUtils.equals(cookie.getName(), COOKIE_NAME_TOKEN)) {
                     cookie.setDomain(COOKIE_DOMAIN);

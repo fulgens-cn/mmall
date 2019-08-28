@@ -54,7 +54,7 @@
 
     <!-- mybatis log 日志 -->
 
-    <logger name="cn.fulgens.mmall.dao" level="DEBUG"/>
+    <logger name="cn.fulgens.mmall.mapper" level="DEBUG"/>
 
     <!--<logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" >-->
         <!--<appender-ref ref="console"/>-->

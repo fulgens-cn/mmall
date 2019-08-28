@@ -1,6 +1,5 @@
 package cn.fulgens.mmall.controller.backend;
 
-import cn.fulgens.mmall.common.Const;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.Product;
@@ -8,16 +7,12 @@ import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IFileService;
 import cn.fulgens.mmall.service.IProductService;
 import cn.fulgens.mmall.service.IUserService;
-import cn.fulgens.mmall.utils.LoginUtil;
-import cn.fulgens.mmall.utils.PropertiesUtil;
+import cn.fulgens.mmall.common.utils.LoginUtil;
+import cn.fulgens.mmall.common.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.ProductDetailVo;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 

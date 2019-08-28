@@ -1,6 +1,6 @@
 package cn.fulgens.mmall.controller.backend;
 
-import cn.fulgens.mmall.common.Const;
+import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
@@ -24,9 +24,9 @@ public class UserManageController {
         ServerResponse<User> serverResponse = userService.login(username, password);
         if (serverResponse.isSuccess()) {
             User user = serverResponse.getData();
-            if (user.getRole() == Const.Role.ROLE_ADMIN) {
+            if (user.getRole() == Constants.Role.ROLE_ADMIN) {
                 // 管理员登录
-                session.setAttribute(Const.CURRENT_USER, user);
+                session.setAttribute(Constants.CURRENT_USER, user);
             }else {
                 return ServerResponse.errorWithMsg("非管理员无权登录后台");
             }

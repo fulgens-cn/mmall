@@ -1,14 +1,14 @@
 package cn.fulgens.mmall.service.impl;
 
-import cn.fulgens.mmall.common.Const;
+import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
-import cn.fulgens.mmall.dao.UserMapper;
+import cn.fulgens.mmall.mapper.UserMapper;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
-import cn.fulgens.mmall.utils.CookieUtil;
-import cn.fulgens.mmall.utils.MD5Util;
-import cn.fulgens.mmall.utils.RedisUtil;
+import cn.fulgens.mmall.common.utils.CookieUtil;
+import cn.fulgens.mmall.common.utils.MD5Util;
+import cn.fulgens.mmall.common.utils.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,17 +69,17 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> register(User user) {
         // 校验用户名是否已经存在
-        ServerResponse<String> checkValid = checkValid(user.getUsername(), Const.USERNAME);
+        ServerResponse<String> checkValid = checkValid(user.getUsername(), Constants.USERNAME);
         if (!checkValid.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名已存在");
         }
         // 校验邮箱是否已经存在
-        checkValid = checkValid(user.getEmail(), Const.EMAIL);
+        checkValid = checkValid(user.getEmail(), Constants.EMAIL);
         if (!checkValid.isSuccess()) {
             return ServerResponse.errorWithMsg("用户邮箱已存在");
         }
         // 设置用户角色，管理员-0，普通用户-1
-        user.setRole(Const.Role.ROLE_USER);
+        user.setRole(Constants.Role.ROLE_USER);
         // 对密码进行md5加密
         user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
         // 插入用户数据
@@ -93,14 +93,14 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> checkValid(String str, String type) {
         if (StringUtils.isNotBlank(type)) {
-            if (type.equals(Const.USERNAME)) {
+            if (type.equals(Constants.USERNAME)) {
                 // 校验用户名是否已经存在
                 int count = userMapper.selectCountByUsername(str);
                 if (count > 0) {
                     return ServerResponse.errorWithMsg("用户名已存在");
                 }
             }
-            if (type.equals(Const.EMAIL)) {
+            if (type.equals(Constants.EMAIL)) {
                 // 校验邮箱是否已经存在
                 int count = userMapper.selectCountByEmail(str);
                 if (count > 0) {
@@ -116,7 +116,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> getQuestionByUsername(String username) {
         // 校验用户名是否存在
-        ServerResponse<String> validResponse = checkValid(username, Const.USERNAME);
+        ServerResponse<String> validResponse = checkValid(username, Constants.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名不存在");
         }
@@ -130,7 +130,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
         // 校验用户名是否存在
-        ServerResponse<String> validResponse = checkValid(username, Const.USERNAME);
+        ServerResponse<String> validResponse = checkValid(username, Constants.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名不存在");
         }
@@ -148,7 +148,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
         // 校验用户名是否存在
-        ServerResponse<String> validResponse = checkValid(username, Const.USERNAME);
+        ServerResponse<String> validResponse = checkValid(username, Constants.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.errorWithMsg("用户名不存在");
         }
@@ -225,7 +225,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse checkAdminRole(User user) {
-        if (user != null && user.getRole().intValue() == Const.Role.ROLE_ADMIN) {
+        if (user != null && user.getRole().intValue() == Constants.Role.ROLE_ADMIN) {
             return ServerResponse.success();
         }
         return ServerResponse.error();
