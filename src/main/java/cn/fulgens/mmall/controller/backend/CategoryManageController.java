@@ -7,9 +7,11 @@ import cn.fulgens.mmall.pojo.Category;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.ICategoryService;
 import cn.fulgens.mmall.service.IUserService;
+import cn.fulgens.mmall.utils.LoginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -31,10 +33,10 @@ public class CategoryManageController {
 
     @GetMapping(value = "add_category.do")
     public ServerResponse<String> addCategory(@RequestParam(value = "parentId", defaultValue = "0") Integer parentId,
-                                              String categoryName, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+                                              String categoryName, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 添加商品品类
@@ -46,10 +48,10 @@ public class CategoryManageController {
 
     @GetMapping(value = "set_category_name.do")
     public ServerResponse<String> updateCategoryName(Integer categoryId, String categoryName,
-                                                     HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+                                                     HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 更新商品品类名称
@@ -60,11 +62,12 @@ public class CategoryManageController {
     }
 
     @GetMapping(value = "get_category.do")
-    public ServerResponse<List<Category>> getCategory(HttpSession session,
-                                                      @RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<List<Category>> getCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId,
+                                                      HttpServletRequest request
+    ) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 根据父品类id获取下一级品类子节点
@@ -75,11 +78,11 @@ public class CategoryManageController {
     }
 
     @GetMapping(value = "get_deep_category.do")
-    public ServerResponse<List<Integer>> getDeepCategory(HttpSession session,
-                                                   @RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<List<Integer>> getDeepCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId,
+                                                         HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 获取当前分类id及递归子节点categoryId

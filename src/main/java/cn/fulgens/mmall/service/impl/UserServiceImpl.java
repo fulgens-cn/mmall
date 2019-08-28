@@ -7,12 +7,16 @@ import cn.fulgens.mmall.common.TokenCache;
 import cn.fulgens.mmall.dao.UserMapper;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
+import cn.fulgens.mmall.utils.CookieUtil;
 import cn.fulgens.mmall.utils.MD5Util;
+import cn.fulgens.mmall.utils.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
@@ -25,6 +29,9 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserServiceImpl implements IUserService {
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Autowired
     private UserMapper userMapper;
@@ -48,9 +55,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ServerResponse<String> logout(HttpSession session) {
-        session.removeAttribute(Const.CURRENT_USER);
-        return ServerResponse.successWithMsg("退出成功");
+    public ServerResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        String token = CookieUtil.readLoginToken(request);
+        if (StringUtils.isEmpty(token)) {
+            return ServerResponse.errorWithMsg("用户未登录无法退出登陆");
+        }
+        CookieUtil.delLoginToken(request, response);
+        redisUtil.delete(token);
+        return ServerResponse.successWithMsg("退出登陆成功");
     }
 
     @Override

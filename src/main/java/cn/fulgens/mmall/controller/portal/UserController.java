@@ -1,15 +1,21 @@
 package cn.fulgens.mmall.controller.portal;
 
-import cn.fulgens.mmall.common.Const;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
+import cn.fulgens.mmall.utils.CookieUtil;
+import cn.fulgens.mmall.utils.JsonUtil;
+import cn.fulgens.mmall.utils.LoginUtil;
+import cn.fulgens.mmall.utils.RedisUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping(value = "/user/")
@@ -19,18 +25,22 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping(value = "login.do")
-    public ServerResponse<User> login(String username, String password, HttpSession session) {
-        ServerResponse<User> serverResponse = userService.login(username, password);
+    public ServerResponse<User> login(@RequestBody User user, HttpServletResponse response) {
+        if (StringUtils.isEmpty(user.getUsername()) || StringUtils.isEmpty(user.getPassword())) {
+            return ServerResponse.errorWithMsg("用户名或密码不正确");
+        }
+        ServerResponse<User> serverResponse = userService.login(user.getUsername(), user.getPassword());
         if (serverResponse.isSuccess()) {
-            // 用户登录成功，将用户对象放入session域
-            session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            String token = UUID.randomUUID().toString().replaceAll("-", "");
+            CookieUtil.writeLoginToken(response, token);
+            RedisUtil.setEx(token, JsonUtil.obj2String(serverResponse.getData()), 30, TimeUnit.MINUTES);
         }
         return serverResponse;
     }
 
     @PostMapping(value = "logout.do")
-    public ServerResponse<String> logout(HttpSession session) {
-        return userService.logout(session);
+    public ServerResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        return userService.logout(request, response);
     }
 
     @PostMapping(value = "register.do")
@@ -46,10 +56,10 @@ public class UserController {
     }
 
     @PostMapping(value = "get_user_info.do")
-    public ServerResponse<User> getUserInfo(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return ServerResponse.successWithData(user);
+    public ServerResponse<User> getUserInfo(HttpServletRequest request) {
+        User currentUser = LoginUtil.getLoginUser(request);
+        if (currentUser != null) {
+            return ServerResponse.successWithData(currentUser);
         }
         return ServerResponse.errorWithMsg("用户未登录,无法获取当前用户信息");
     }
@@ -73,8 +83,8 @@ public class UserController {
 
     @PostMapping(value = "reset_password.do")
     public ServerResponse<String> resetPassword(String passwordOld, String passwordNew,
-                                                HttpSession session) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+                                                HttpServletRequest request) {
+        User currentUser = LoginUtil.getLoginUser(request);
         if (currentUser == null) {
             return ServerResponse.errorWithMsg("用户未登录");
         }
@@ -82,27 +92,26 @@ public class UserController {
     }
 
     @PostMapping(value = "update_information.do")
-    public ServerResponse<User> updateUserInfo(User user, HttpSession session) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> updateUserInfo(User user, HttpServletRequest request) {
+        User currentUser = LoginUtil.getLoginUser(request);
         if (currentUser == null) {
-            return ServerResponse.errorWithMsg("用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         user.setId(currentUser.getId());
         user.setUsername(currentUser.getUsername());
         ServerResponse<User> serverResponse = userService.updateUserInfo(user);
         if (serverResponse.isSuccess()) {
-            // 更新用户信息成功，更新session中的用户信息
-            session.setAttribute(Const.CURRENT_USER, serverResponse.getData());
+            // 更新用户信息成功，更新redis中的用户信息
+            RedisUtil.setEx(CookieUtil.readLoginToken(request), JsonUtil.obj2String(serverResponse.getData()), 30, TimeUnit.MINUTES);
         }
         return serverResponse;
     }
 
     @PostMapping(value = "get_information.do")
-    public ServerResponse<User> getInformation(HttpSession session) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> getInformation(HttpServletRequest request) {
+        User currentUser = LoginUtil.getLoginUser(request);
         if (currentUser == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(),
-                    "用户未登录,无法获取当前用户信息,status=10,强制登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         return userService.getUserInfoById(currentUser.getId());
     }

@@ -1,5 +1,6 @@
 package cn.fulgens.mmall.config;
 
+import cn.fulgens.mmall.filter.SessionExpireFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -8,9 +9,11 @@ import javax.servlet.*;
 /**
  * 继承WebApplicationInitializer的基础实现AbstractAnnotationConfigDispatcherServletInitializer
  * 实现对DispatcherServlet及ContextLoaderListenser的java配置
+ *
+ * @author fulgens
  */
-public class WebAppInitializer
-        extends AbstractAnnotationConfigDispatcherServletInitializer {
+public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class[]{RootConfig.class};
@@ -37,6 +40,10 @@ public class WebAppInitializer
         characterEncodingFilter.setInitParameter("forceEncoding", "true");
         // 设置UrlPattern
         characterEncodingFilter.addMappingForUrlPatterns(null, false, "/*");
+
+        // 添加Redis Session过期时间重置过滤器
+        FilterRegistration.Dynamic sessionExpireFilter = servletContext.addFilter("sessionExpireFilter", SessionExpireFilter.class);
+        sessionExpireFilter.addMappingForUrlPatterns(null, false, "*.do");
         super.onStartup(servletContext);
     }
 

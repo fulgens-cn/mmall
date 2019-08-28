@@ -5,6 +5,7 @@ import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IOrderService;
+import cn.fulgens.mmall.utils.LoginUtil;
 import cn.fulgens.mmall.vo.OrderProductVo;
 import cn.fulgens.mmall.vo.OrderVo;
 import com.alipay.api.AlipayApiException;
@@ -32,68 +33,104 @@ public class OrderController {
     @Autowired
     private IOrderService orderService;
 
-    // 创建订单
+    /**
+     * 创建订单
+     * @param shippingId
+     * @param request
+     * @return
+     */
     @RequestMapping("create.do")
-    public ServerResponse<OrderVo> createOrder(Integer shippingId, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<OrderVo> createOrder(Integer shippingId, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         return orderService.createOrder(user.getId(), shippingId);
     }
 
-    // 根据订单编号取消订单
+    /**
+     * 根据订单编号取消订单
+     * @param orderNo
+     * @param request
+     * @return
+     */
     @RequestMapping("cancel.do")
-    public ServerResponse<String> cancelOrder(Long orderNo, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<String> cancelOrder(Long orderNo, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         return orderService.cancelOrder(user.getId(), orderNo);
     }
 
-    // 确认订单前的预览
+    /**
+     * 确认订单前预览
+     * @param request
+     * @return
+     */
     @RequestMapping("get_order_cart_product.do")
-    public ServerResponse<OrderProductVo> getOrderCartProduct(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<OrderProductVo> getOrderCartProduct(HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         return orderService.getOrderCartProduct(user.getId());
     }
 
-    // 用户查看订单详情
+    /**
+     * 用户查看订单详情
+     * @param orderNo
+     * @param request
+     * @return
+     */
     @RequestMapping("detail.do")
-    public ServerResponse<OrderVo> detail(Long orderNo, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<OrderVo> detail(Long orderNo, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         return orderService.getOrderDetail(user.getId(), orderNo);
     }
 
+    /**
+     * 订单列表
+     * @param pageNum
+     * @param pageSize
+     * @param request
+     * @return
+     */
     @RequestMapping("list.do")
     public ServerResponse<com.github.pagehelper.PageInfo> detail(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
-                                                                 @RequestParam(value = "pageSize", defaultValue = "10") int pageSize, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+                                                                 @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
+                                                                 HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         return orderService.getOrderList(user.getId(), pageNum, pageSize);
     }
 
-    // 订单支付
+    /**
+     * 订单支付
+     * @param orderNo
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "pay.do")
-    public ServerResponse pay(Long orderNo, HttpSession session, HttpServletRequest request) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse pay(Long orderNo, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         String path = request.getSession().getServletContext().getRealPath("upload");
         return orderService.pay(user.getId(), orderNo, path);
     }
 
-    // 支付宝当面付异步通知处理
+    /**
+     * 支付宝当面付异步通知处理
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "alipay_callback.do")
     public Object alipayCallback(HttpServletRequest request) {
         // 获取当面付异步通知参数列表
@@ -133,11 +170,17 @@ public class OrderController {
         return Const.AlipayCallback.RESPONSE_FAILED;
     }
 
+    /**
+     * 查询订单支付状态
+     * @param orderNo
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "query_order_pay_status.do")
-    public ServerResponse<Boolean> queryOrderPayStatus(long orderNo, HttpSession session) {
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user ==null){
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+    public ServerResponse<Boolean> queryOrderPayStatus(long orderNo, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
+        if (user == null) {
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
 
         ServerResponse serverResponse = orderService.queryOrderPayStatus(user.getId(),orderNo);

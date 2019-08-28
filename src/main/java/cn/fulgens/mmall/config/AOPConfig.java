@@ -10,9 +10,9 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public class AOPConfig {
 
     // 需将切面类配置进来
-    @Bean
-    public RequestAspect requestAspect() {
-        return new RequestAspect();
-    }
+//    @Bean
+//    public RequestAspect requestAspect() {
+//        return new RequestAspect();
+//    }
 
 }

@@ -3,6 +3,8 @@ package cn.fulgens.mmall.service;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.pojo.User;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 /**
 * @Author: fulgens
@@ -22,10 +24,10 @@ public interface IUserService {
 
     /**
      * 用户退出登录
-     * @param session
+     * @param request
      * @return
      */
-    ServerResponse<String> logout(HttpSession session);
+    ServerResponse<String> logout(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 用户注册

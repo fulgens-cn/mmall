@@ -8,6 +8,7 @@ import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IFileService;
 import cn.fulgens.mmall.service.IProductService;
 import cn.fulgens.mmall.service.IUserService;
+import cn.fulgens.mmall.utils.LoginUtil;
 import cn.fulgens.mmall.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.ProductDetailVo;
 import com.github.pagehelper.PageInfo;
@@ -51,10 +52,10 @@ public class ProductManageController {
     private static String FTP_SERVER_HTTP_PREFIX = PropertiesUtil.getProperty("ftp.server.http.prefix");
 
     @RequestMapping(value = "save.do")
-    public ServerResponse saveProduct(Product product, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse saveProduct(Product product, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 保存或更新产品
@@ -64,12 +65,18 @@ public class ProductManageController {
         }
     }
 
-    // 产品上下架
+    /**
+     * 产品上下架
+     * @param productId
+     * @param status
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "set_sale_status.do")
-    public ServerResponse<String> setSaleStatus(Integer productId, Integer status, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<String> setSaleStatus(Integer productId, Integer status, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 保存或更新产品
@@ -79,12 +86,17 @@ public class ProductManageController {
         }
     }
 
-    // 产品详情
+    /**
+     * 产品详情
+     * @param productId
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "detail.do")
-    public ServerResponse<ProductDetailVo> getProductDetail(Integer productId, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<ProductDetailVo> getProductDetail(Integer productId, HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 获取产品详情
@@ -94,14 +106,20 @@ public class ProductManageController {
         }
     }
 
-    // 产品列表
+    /**
+     * 产品列表
+     * @param pageNum
+     * @param pageSize
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "list.do")
-    public ServerResponse<PageInfo> getProductList(HttpSession session,
-                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<PageInfo> getProductList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                   HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 获取产品列表
@@ -111,14 +129,23 @@ public class ProductManageController {
         }
     }
 
-    // 产品搜索（根据产品名称或产品id）
+    /**
+     * 产品搜索（根据产品名称或产品id）
+     * @param productName
+     * @param productId
+     * @param pageNum
+     * @param pageSize
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "search.do")
-    public ServerResponse<PageInfo> searchProduct(HttpSession session, String productName, Integer productId,
+    public ServerResponse<PageInfo> searchProduct(String productName, Integer productId,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+                                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                                  HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "用户未登录");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 产品搜索
@@ -128,13 +155,19 @@ public class ProductManageController {
         }
     }
 
-    // 图片上传
+    /**
+     * 图片上传
+     * @param file
+     * @param request
+     * @param request
+     * @return
+     */
     @PostMapping(value = "upload.do")
     public ServerResponse uploadImg(@RequestParam(value = "upload_file", required = false) MultipartFile file,
-                                    HttpServletRequest request, HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+                                    HttpServletRequest request) {
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.NEED_LOGIN.getCode(), "请登录管理员账户");
+            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
         }
         if (userService.checkAdminRole(user).isSuccess()) {
             // 图片上传
@@ -152,12 +185,18 @@ public class ProductManageController {
         }
     }
 
-    // 使用Simditor富文本上传图片
+    /**
+     * 使用Simditor富文本上传图片
+     * @param file
+     * @param request
+     * @param response
+     * @return
+     */
     @PostMapping("richtext_img_upload.do")
     public Map uploadImg(@RequestParam(value = "upload_file", required = false) MultipartFile file,
-                                    HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+                                    HttpServletRequest request, HttpServletResponse response) {
         Map simditorResultMap = Maps.newHashMap();
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        User user = LoginUtil.getLoginUser(request);
         if (user == null) {
             simditorResultMap.put("success", false);
             simditorResultMap.put("msg", "请登录管理员账户");
