@@ -1,13 +1,11 @@
 package cn.fulgens.mmall.controller.backend;
 
-import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
+import cn.fulgens.mmall.common.SimditorServerResponse;
 import cn.fulgens.mmall.pojo.Product;
-import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IFileService;
 import cn.fulgens.mmall.service.IProductService;
 import cn.fulgens.mmall.service.IUserService;
-import cn.fulgens.mmall.common.utils.LoginUtil;
 import cn.fulgens.mmall.common.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.ProductDetailVo;
 import com.github.pagehelper.PageInfo;
@@ -22,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
 * @Author: fulgens
@@ -31,7 +28,7 @@ import java.util.Map;
 * @Modified by:
 */
 @RestController
-@RequestMapping(value = "/manage/product/")
+@RequestMapping(value = "/manage/product")
 public class ProductManageController {
 
     @Autowired
@@ -45,82 +42,42 @@ public class ProductManageController {
 
     private static String FTP_SERVER_HTTP_PREFIX = PropertiesUtil.getProperty("ftp.server.http.prefix");
 
-    @RequestMapping(value = "save.do")
+    @RequestMapping(value = "/save.do")
     public ServerResponse saveProduct(Product product, HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 保存或更新产品
-            return productService.saveOrUpdate(product);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+        return productService.saveOrUpdate(product);
     }
 
     /**
      * 产品上下架
      * @param productId
      * @param status
-     * @param request
      * @return
      */
-    @RequestMapping(value = "set_sale_status.do")
-    public ServerResponse<String> setSaleStatus(Integer productId, Integer status, HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 保存或更新产品
-            return productService.updateStatusById(productId, status);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+    @RequestMapping(value = "/set_sale_status.do")
+    public ServerResponse<String> setSaleStatus(Integer productId, Integer status) {
+        return productService.updateStatusById(productId, status);
     }
 
     /**
      * 产品详情
      * @param productId
-     * @param request
      * @return
      */
-    @RequestMapping(value = "detail.do")
-    public ServerResponse<ProductDetailVo> getProductDetail(Integer productId, HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 获取产品详情
-            return productService.getManageProductDetail(productId);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+    @RequestMapping(value = "/detail.do")
+    public ServerResponse<ProductDetailVo> getProductDetail(Integer productId) {
+        return productService.getManageProductDetail(productId);
     }
 
     /**
      * 产品列表
      * @param pageNum
      * @param pageSize
-     * @param request
      * @return
      */
-    @RequestMapping(value = "list.do")
+    @RequestMapping(value = "/list.do")
     public ServerResponse<PageInfo> getProductList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                   HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 获取产品列表
-            return productService.getProductList(pageNum, pageSize);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+                                                   @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return productService.getProductList(pageNum, pageSize);
     }
 
     /**
@@ -129,54 +86,34 @@ public class ProductManageController {
      * @param productId
      * @param pageNum
      * @param pageSize
-     * @param request
      * @return
      */
-    @RequestMapping(value = "search.do")
+    @RequestMapping(value = "/search.do")
     public ServerResponse<PageInfo> searchProduct(String productName, Integer productId,
                                                   @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-                                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                                  HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 产品搜索
-            return productService.searchProduct(productName, productId, pageNum, pageSize);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+                                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return productService.searchProduct(productName, productId, pageNum, pageSize);
     }
 
     /**
      * 图片上传
      * @param file
      * @param request
-     * @param request
      * @return
      */
-    @PostMapping(value = "upload.do")
+    @PostMapping(value = "/upload.do")
     public ServerResponse uploadImg(@RequestParam(value = "upload_file", required = false) MultipartFile file,
                                     HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
+        // 图片上传
+        String path = request.getSession().getServletContext().getRealPath("/upload");
+        String targetFileName = fileService.uploadFile(file, path);
+        if (targetFileName == null) {
+            return ServerResponse.errorWithMsg("文件上传失败");
         }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 图片上传
-            String path = request.getSession().getServletContext().getRealPath("/upload");
-            String targetFileName = fileService.uploadFile(file, path);
-            if (targetFileName == null) {
-                return ServerResponse.errorWithMsg("文件上传失败");
-            }
-            HashMap<String, String> resultMap = Maps.newHashMap();
-            resultMap.put("uri", targetFileName);
-            resultMap.put("url", FTP_SERVER_HTTP_PREFIX + targetFileName);
-            return ServerResponse.successWithData(resultMap);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+        HashMap<String, String> resultMap = Maps.newHashMap();
+        resultMap.put("uri", targetFileName);
+        resultMap.put("url", FTP_SERVER_HTTP_PREFIX + targetFileName);
+        return ServerResponse.successWithData(resultMap);
     }
 
     /**
@@ -186,38 +123,17 @@ public class ProductManageController {
      * @param response
      * @return
      */
-    @PostMapping("richtext_img_upload.do")
-    public Map uploadImg(@RequestParam(value = "upload_file", required = false) MultipartFile file,
-                                    HttpServletRequest request, HttpServletResponse response) {
-        Map simditorResultMap = Maps.newHashMap();
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            simditorResultMap.put("success", false);
-            simditorResultMap.put("msg", "请登录管理员账户");
-            simditorResultMap.put("file_path", null);
-            return simditorResultMap;
+    @PostMapping("/richtext_img_upload.do")
+    public SimditorServerResponse uploadImg(@RequestParam(value = "upload_file", required = false) MultipartFile file,
+                                            HttpServletRequest request, HttpServletResponse response) {
+        // 图片上传
+        String path = request.getSession().getServletContext().getRealPath("/upload");
+        String targetFileName = fileService.uploadFile(file, path);
+        if (targetFileName == null) {
+            response.addHeader("Access-Control-Allow-Headers", "X-File_Name");
+            return SimditorServerResponse.error("上传图片失败", null);
         }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 图片上传
-            String path = request.getSession().getServletContext().getRealPath("/upload");
-            String targetFileName = fileService.uploadFile(file, path);
-            if (targetFileName == null) {
-                simditorResultMap.put("success", false);
-                simditorResultMap.put("msg", "上传图片失败");
-                simditorResultMap.put("file_path", null);
-                response.addHeader("Access-Control-Allow-Headers", "X-File_Name");
-                return simditorResultMap;
-            }
-            simditorResultMap.put("success", true);
-            simditorResultMap.put("msg", "上传图片成功");
-            simditorResultMap.put("file_path", FTP_SERVER_HTTP_PREFIX + targetFileName);
-            return simditorResultMap;
-        }else {
-            simditorResultMap.put("success", false);
-            simditorResultMap.put("msg", "无权限执行操作，需要管理员权限");
-            simditorResultMap.put("file_path", null);
-            return simditorResultMap;
-        }
+        return SimditorServerResponse.success("上传图片成功", FTP_SERVER_HTTP_PREFIX + targetFileName);
     }
 
 }

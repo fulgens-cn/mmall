@@ -1,5 +1,6 @@
 package cn.fulgens.mmall.config;
 
+import cn.fulgens.mmall.common.interceptor.AuthorityInterceptor;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
@@ -15,9 +16,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
@@ -136,18 +135,12 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return multipartResolver;
     }
 
-    // 重写configureMessageConverters方法使用fastjson作为json数据的消息转换器
     // Fastjson 版本小于1.2.36，在与Spring MVC 4.X 版本集成时需使用 FastJsonHttpMessageConverter4
     // 参考：https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        super.configureMessageConverters(converters);
-
-        // 创建fastjson提供的消息转换器FastJsonHttpMessageConverter
         FastJsonHttpMessageConverter messageConverter = new FastJsonHttpMessageConverter();
-        // 创建fastjson配置对象FastJsonConfig
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        // 设置格式化json数据
         // fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
         /* WriteNullNumberAsZero—-数值字段如果为null,输出为0,而非null
          WriteNullListAsEmpty—–List字段如果为null,输出为[],而非null
@@ -155,14 +148,24 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
          WriteNullBooleanAsFalse–Boolean字段如果为null,输出为false,而非null*/
         // 设置输出值为null的字段,默认为false
         // fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue);
-        // 为消息转换器设置配置
         messageConverter.setFastJsonConfig(fastJsonConfig);
-        // 配置支持的MediaType
         List<MediaType> mediaTypeList = new ArrayList<>();
         mediaTypeList.add(MediaType.APPLICATION_JSON_UTF8);
         messageConverter.setSupportedMediaTypes(mediaTypeList);
-        // 添加fastjson消息转换器到转换器列表中
         converters.add(messageConverter);
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
+                .maxAge(3600)
+                .allowCredentials(true);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AuthorityInterceptor()).addPathPatterns("/manage/**");
+    }
 }

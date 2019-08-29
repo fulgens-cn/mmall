@@ -20,7 +20,7 @@ import java.util.List;
 * @Modified by:
 */
 @RestController
-@RequestMapping(value = "/manage/category/")
+@RequestMapping(value = "/manage/category")
 public class CategoryManageController {
 
     @Autowired
@@ -29,64 +29,24 @@ public class CategoryManageController {
     @Autowired
     private ICategoryService categoryService;
 
-    @GetMapping(value = "add_category.do")
+    @GetMapping(value = "/add_category.do")
     public ServerResponse<String> addCategory(@RequestParam(value = "parentId", defaultValue = "0") Integer parentId,
-                                              String categoryName, HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 添加商品品类
-            return categoryService.addCategory(parentId, categoryName);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+                                              String categoryName) {
+        return categoryService.addCategory(parentId, categoryName);
     }
 
-    @GetMapping(value = "set_category_name.do")
-    public ServerResponse<String> updateCategoryName(Integer categoryId, String categoryName,
-                                                     HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 更新商品品类名称
-            return categoryService.updateCategoryNameById(categoryId, categoryName);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+    @GetMapping(value = "/set_category_name.do")
+    public ServerResponse<String> updateCategoryName(Integer categoryId, String categoryName) {
+        return categoryService.updateCategoryNameById(categoryId, categoryName);
     }
 
-    @GetMapping(value = "get_category.do")
-    public ServerResponse<List<Category>> getCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId,
-                                                      HttpServletRequest request
-    ) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 根据父品类id获取下一级品类子节点
-            return categoryService.getChildrenByParentId(categoryId);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+    @GetMapping(value = "/get_category.do")
+    public ServerResponse<List<Category>> getCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId) {
+        return categoryService.getChildrenByParentId(categoryId);
     }
 
-    @GetMapping(value = "get_deep_category.do")
-    public ServerResponse<List<Integer>> getDeepCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId,
-                                                         HttpServletRequest request) {
-        User user = LoginUtil.getLoginUser(request);
-        if (user == null) {
-            return ServerResponse.buildWithResponseCode(ResponseCode.NEED_LOGIN);
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            // 获取当前分类id及递归子节点categoryId
-            return categoryService.getCategoryAndChildrenById(categoryId);
-        }else {
-            return ServerResponse.errorWithMsg("无权限执行操作，需要管理员权限");
-        }
+    @GetMapping(value = "/get_deep_category.do")
+    public ServerResponse<List<Integer>> getDeepCategory(@RequestParam(value = "categoryId", defaultValue = "0")Integer categoryId) {
+        return categoryService.getCategoryAndChildrenById(categoryId);
     }
 }
