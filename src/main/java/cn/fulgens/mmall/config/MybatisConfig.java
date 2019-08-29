@@ -1,6 +1,7 @@
 package cn.fulgens.mmall.config;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
@@ -35,12 +36,11 @@ public class MybatisConfig {
     /**
      * 配置SqlSessionFactoryBean
      * @param dataSource
-     * @param pageHelper
+     * @param pageInterceptor
      * @return
      */
     @Bean
-    public SqlSessionFactoryBean sqlSessionFactoryBean(DataSource dataSource,
-                                                       PageHelper pageHelper) {
+    public SqlSessionFactoryBean sqlSessionFactoryBean(DataSource dataSource, PageInterceptor pageInterceptor) {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         // 注入数据源
         sqlSessionFactoryBean.setDataSource(dataSource);
@@ -59,15 +59,13 @@ public class MybatisConfig {
         }
         sqlSessionFactoryBean.setMapperLocations(mapperResource);
         // 配置PageHelper插件
-        sqlSessionFactoryBean.setPlugins(new Interceptor[]{pageHelper});
+        sqlSessionFactoryBean.setPlugins(new Interceptor[]{pageInterceptor});
         return sqlSessionFactoryBean;
     }
 
     @Bean
-    public PageHelper pageHelper() {
-        PageHelper pageHelper = new PageHelper();
-        // PageHelper配置参见https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/en/HowToUse.md
-        return pageHelper;
+    public PageInterceptor pageInterceptor() {
+        return new PageInterceptor();
     }
 
     /**
@@ -76,8 +74,7 @@ public class MybatisConfig {
      */
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer() {
-        MapperScannerConfigurer mapperScannerConfigurer =
-                new MapperScannerConfigurer();
+        MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setBasePackage("cn.fulgens.mmall.mapper");
         return mapperScannerConfigurer;
     }
@@ -89,9 +86,7 @@ public class MybatisConfig {
      */
     @Bean
     public DataSourceTransactionManager dataSourceTransactionManager(DataSource dataSource) {
-        DataSourceTransactionManager dataSourceTransactionManager =
-                new DataSourceTransactionManager();
-        // 注入数据源
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
         dataSourceTransactionManager.setDataSource(dataSource);
         return dataSourceTransactionManager;
     }

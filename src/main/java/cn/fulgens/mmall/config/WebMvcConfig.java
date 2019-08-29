@@ -17,10 +17,10 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.spring5.ISpringTemplateEngine;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
@@ -42,7 +42,7 @@ import java.util.Set;
                 @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)
         }
 )
-public class WebMvcConfig extends WebMvcConfigurerAdapter {
+public class WebMvcConfig implements WebMvcConfigurer {
 
     @Bean
     public ITemplateResolver templateResolver() {
@@ -74,7 +74,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     }*/
 
     @Bean
-    public TemplateEngine templateEngine(Set<ITemplateResolver> resolvers) {
+    public ISpringTemplateEngine templateEngine(Set<ITemplateResolver> resolvers) {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         // 注入模板解析器
         templateEngine.setTemplateResolvers(resolvers);
@@ -83,7 +83,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     @Primary
-    public ViewResolver viewResolver(TemplateEngine templateEngine) {
+    public ViewResolver viewResolver(ISpringTemplateEngine templateEngine) {
         ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
         viewResolver.setTemplateEngine(templateEngine);
         viewResolver.setCharacterEncoding("UTF-8");
@@ -114,15 +114,13 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     // 或web应用的根路径下（没有前缀）
     @Bean
     public MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource =
-                new ReloadableResourceBundleMessageSource();
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         // 设置国际化信息源的基本名称
         messageSource.setBasename("classpath:messages");
         messageSource.setCacheSeconds(10);
         return messageSource;
     }
 
-    // 文件上传解析器
     @Bean
     public MultipartResolver multipartResolver() {
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
@@ -135,17 +133,15 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return multipartResolver;
     }
 
-    // Fastjson 版本小于1.2.36，在与Spring MVC 4.X 版本集成时需使用 FastJsonHttpMessageConverter4
-    // 参考：https://github.com/alibaba/fastjson/wiki/%E5%9C%A8-Spring-%E4%B8%AD%E9%9B%86%E6%88%90-Fastjson
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         FastJsonHttpMessageConverter messageConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         // fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
-        /* WriteNullNumberAsZero—-数值字段如果为null,输出为0,而非null
-         WriteNullListAsEmpty—–List字段如果为null,输出为[],而非null
-         WriteNullStringAsEmpty—字符类型字段如果为null,输出为"",而非null
-         WriteNullBooleanAsFalse–Boolean字段如果为null,输出为false,而非null*/
+        // WriteNullNumberAsZero—-数值字段如果为null,输出为0,而非null
+        // WriteNullListAsEmpty—–List字段如果为null,输出为[],而非null
+        // WriteNullStringAsEmpty—字符类型字段如果为null,输出为"",而非null
+        // WriteNullBooleanAsFalse–Boolean字段如果为null,输出为false,而非null
         // 设置输出值为null的字段,默认为false
         // fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteMapNullValue);
         messageConverter.setFastJsonConfig(fastJsonConfig);
