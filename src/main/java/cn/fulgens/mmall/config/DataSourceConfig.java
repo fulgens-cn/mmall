@@ -10,19 +10,29 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
+/**
+ * 数据源配置
+ * 注：@PropertySource(value = {"classpath:jdbc.properties"})
+ * 相当于<context:property-placeholder location="classpath:jdbc.properties"/>
+ *
+ * @author fulgens
+ */
 @Configuration
 @PropertySource(value = {"classpath:jdbc.properties"})
-// 相当于<context:property-placeholder location="classpath:jdbc.properties"/>
 public class DataSourceConfig {
 
     @Autowired
     private Environment env;
 
-    // 配置Druid连接池
+    /**
+     * Druid连接池配置
+     * 参考https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE_DruidDataSource%E5%8F%82%E8%80%83%E9%85%8D%E7%BD%AE
+     *
+     * @return
+     */
     @Bean
     public DataSource dataSource() {
         DruidDataSource dataSource = new DruidDataSource();
-        // 参考https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE_DruidDataSource%E5%8F%82%E8%80%83%E9%85%8D%E7%BD%AE
         // 基本属性配置
         dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
         dataSource.setUrl(env.getProperty("jdbc.url"));
@@ -43,8 +53,12 @@ public class DataSourceConfig {
         return dataSource;
     }
 
+    /**
+     * JdbcTemplate配置
+     * @param dataSource
+     * @return
+     */
     @Bean
-    // 配置jdbc模板
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }

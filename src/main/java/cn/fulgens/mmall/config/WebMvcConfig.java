@@ -33,9 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * SpringMVC配置类
+ *
+ * @author fulgens
+ */
 @Configuration
+@EnableWebMvc
 @ComponentScan(basePackages = {"cn.fulgens.mmall.controller"})
-@EnableWebMvc   // 启用spring mvc
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     /********************************Thymeleaf*********************************/
