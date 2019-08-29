@@ -3,6 +3,7 @@ package cn.fulgens.mmall.controller.portal;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.common.aop.SystemLog;
+import cn.fulgens.mmall.common.exception.ResourceNotFoundException;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
 import cn.fulgens.mmall.common.utils.CookieUtil;
@@ -21,14 +22,14 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/user/")
+@RequestMapping(value = "/user")
 public class UserController {
 
     @Autowired
     private IUserService userService;
 
     @SystemLog(value = "用户登陆")
-    @PostMapping(value = "login.do")
+    @PostMapping(value = "/login.do")
     public ServerResponse<User> login(@RequestBody User user, HttpServletResponse response) {
         if (StringUtils.isEmpty(user.getUsername()) || StringUtils.isEmpty(user.getPassword())) {
             return ServerResponse.errorWithMsg("用户名或密码不正确");
@@ -43,24 +44,24 @@ public class UserController {
     }
 
     @SystemLog(value = "用户推出登陆")
-    @PostMapping(value = "logout.do")
+    @PostMapping(value = "/logout.do")
     public ServerResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
         return userService.logout(request, response);
     }
 
-    @PostMapping(value = "register.do")
+    @PostMapping(value = "/register.do")
     public ServerResponse<String> register(User user) {
         // TODO 对user属性进行校验
         return userService.register(user);
     }
 
-    @PostMapping(value = "check_valid.do")
+    @PostMapping(value = "/check_valid.do")
     public ServerResponse<String> checkValid(@RequestParam String str,
                                              @RequestParam String type) {
         return userService.checkValid(str, type);
     }
 
-    @PostMapping(value = "get_user_info.do")
+    @PostMapping(value = "/get_user_info.do")
     public ServerResponse<User> getUserInfo(HttpServletRequest request) {
         User currentUser = LoginUtil.getLoginUser(request);
         if (currentUser != null) {
@@ -69,24 +70,24 @@ public class UserController {
         return ServerResponse.errorWithMsg("用户未登录,无法获取当前用户信息");
     }
 
-    @PostMapping(value = "forget_get_question.do")
+    @PostMapping(value = "/forget_get_question.do")
     public ServerResponse<String> forgetGetQuestion(String username) {
         return userService.getQuestionByUsername(username);
     }
 
-    @PostMapping(value = "forget_check_answer.do")
+    @PostMapping(value = "/forget_check_answer.do")
     public ServerResponse<String> forgetCheckAnswer(String username, String question,
                                                     String answer) {
         return userService.checkAnswer(username, question, answer);
     }
 
-    @PostMapping(value = "forget_reset_password.do")
+    @PostMapping(value = "/forget_reset_password.do")
     public ServerResponse<String> forgetResetPassword(String username, String passwordNew,
                                                       String forgetToken) {
         return userService.forgetResetPassword(username, passwordNew, forgetToken);
     }
 
-    @PostMapping(value = "reset_password.do")
+    @PostMapping(value = "/reset_password.do")
     public ServerResponse<String> resetPassword(String passwordOld, String passwordNew,
                                                 HttpServletRequest request) {
         User currentUser = LoginUtil.getLoginUser(request);
@@ -96,7 +97,7 @@ public class UserController {
         return userService.resetPassword(passwordOld, passwordNew, currentUser);
     }
 
-    @PostMapping(value = "update_information.do")
+    @PostMapping(value = "/update_information.do")
     public ServerResponse<User> updateUserInfo(User user, HttpServletRequest request) {
         User currentUser = LoginUtil.getLoginUser(request);
         if (currentUser == null) {
@@ -112,7 +113,7 @@ public class UserController {
         return serverResponse;
     }
 
-    @PostMapping(value = "get_information.do")
+    @PostMapping(value = "/get_information.do")
     public ServerResponse<User> getInformation(HttpServletRequest request) {
         User currentUser = LoginUtil.getLoginUser(request);
         if (currentUser == null) {
