@@ -3,8 +3,6 @@ package cn.fulgens.mmall.config;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import com.alibaba.fastjson.support.spring.FastJsonpHttpMessageConverter4;
-import com.alibaba.fastjson.support.spring.FastJsonpResponseBodyAdvice;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -12,7 +10,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.WebApplicationInitializer;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
@@ -20,8 +18,6 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.JstlView;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver;
@@ -40,17 +36,20 @@ import java.util.Set;
  */
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"cn.fulgens.mmall.controller"})
+@ComponentScan(
+        basePackages = {"cn.fulgens.mmall.controller"},
+        useDefaultFilters = false,
+        includeFilters = {
+                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = Controller.class)
+        }
+)
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
-    /********************************Thymeleaf*********************************/
-    // 配置模板解析器
-    // Thymeleaf3使用ITemplateResolver接口，SpringResourceTemplateResolver实现类
-    // Thymeleaf3之前使用TemplateResolver接口，ServletContextTemplateResolver实现类
     @Bean
     public ITemplateResolver templateResolver() {
-        SpringResourceTemplateResolver templateResolver =
-                new SpringResourceTemplateResolver();
+        // Thymeleaf3使用ITemplateResolver接口，SpringResourceTemplateResolver实现类
+        // Thymeleaf3之前使用TemplateResolver接口，ServletContextTemplateResolver实现类
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setPrefix("/WEB-INF/templates/");
         templateResolver.setSuffix(".html");
         // 设置templateMode属性为HTML5
@@ -79,7 +78,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public TemplateEngine templateEngine(Set<ITemplateResolver> resolvers) {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         // 注入模板解析器
-        // templateEngine.setTemplateResolver(templateResolver);
         templateEngine.setTemplateResolvers(resolvers);
         return templateEngine;
     }
@@ -93,15 +91,13 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         return viewResolver;
     }
 
-    /********************************放行静态资源*********************************/
     @Override
-    // 通过继承WebMvcConfigurerAdapter重写configureDefaultServletHandling方法放行静态资源
-    // 相当于xml配置中的<mvc:default-servlet-handler/>
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+        // 放行静态资源
+        // 相当于xml配置中的<mvc:default-servlet-handler/>
         configurer.enable();
     }
 
-    /********************************国际化信息源*********************************/
     /*@Bean
     // 国际化信息源ResourceBundleMessageSource
     // 需配合spring标签<s:message code="..." />使用
@@ -130,8 +126,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     // 文件上传解析器
     @Bean
     public MultipartResolver multipartResolver() {
-        CommonsMultipartResolver multipartResolver =
-                new CommonsMultipartResolver();
+        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
         // 最大上传文件大小，单位字节，这里设置为2M（2*1024*1024）
         multipartResolver.setMaxUploadSize(2097152);
         // 文件上传过程中内存存储大小
