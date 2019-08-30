@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return ServerResponse.errorWithMsg(exception.getErrCode(), exception.getMessage());
     }
 
+    @ExceptionHandler(ValidationFailureException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ServerResponse handleValidationFailureException(Exception e) {
+        ValidationFailureException exception = (ValidationFailureException) e;
+        return ServerResponse.errorWithMsg(exception.getErrCode(), exception.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ServerResponse handleUnExceptedException(Exception e) {

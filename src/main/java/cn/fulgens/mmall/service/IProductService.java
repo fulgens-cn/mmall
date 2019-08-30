@@ -58,7 +58,7 @@ public interface IProductService {
      * @param productId
      * @return
      */
-    ServerResponse<ProductDetailVo> getProductDetail(Integer productId);
+    ProductDetailVo getProductDetail(Integer productId);
 
     /**
      * 根据关键词（产品名）、产品品类id获取产品列表，并排序

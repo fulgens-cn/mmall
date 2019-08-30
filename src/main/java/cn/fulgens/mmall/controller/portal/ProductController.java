@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/product/")
+@RequestMapping(value = "/product")
 public class ProductController {
 
     @Autowired
     private IProductService productService;
 
-    @RequestMapping(value = "detail.do")
+    @RequestMapping(value = "/detail.do")
     public ServerResponse<ProductDetailVo> getDetail(Integer productId) {
-        return productService.getProductDetail(productId);
+        return ServerResponse.successWithMsgAndData("获取产品详情信息成功", productService.getProductDetail(productId));
     }
 
-    @RequestMapping(value = "list.do")
+    @RequestMapping(value = "/list.do")
     public ServerResponse<PageInfo> list(@RequestParam(value = "keyword", required = false)String keyword,
                                          @RequestParam(value = "categoryId", required = false)Integer categoryId,
                                          @RequestParam(value = "pageNum", defaultValue = "1")Integer pageNum,

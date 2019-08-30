@@ -3,6 +3,7 @@ package cn.fulgens.mmall.service.impl;
 import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
+import cn.fulgens.mmall.common.exception.ValidationFailureException;
 import cn.fulgens.mmall.mapper.CategoryMapper;
 import cn.fulgens.mmall.mapper.ProductMapper;
 import cn.fulgens.mmall.pojo.Category;
@@ -18,6 +19,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -171,17 +173,18 @@ public class ProductServiceImpl implements IProductService {
         return ServerResponse.successWithData(pageInfo);
     }
 
+    @Cacheable(value = "product", key = "#productId", unless = "#result == null")
     @Override
-    public ServerResponse<ProductDetailVo> getProductDetail(Integer productId) {
+    public ProductDetailVo getProductDetail(Integer productId) {
         if (productId == null) {
-            return ServerResponse.errorWithMsg(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+            throw new ValidationFailureException("产品id不能为空");
         }
         Product product = productMapper.selectByPrimaryKey(productId);
         if (product == null || product.getStatus() != Constants.ProductStatusEnum.ON_SALE.getCode()) {
-            return ServerResponse.errorWithMsg("产品已下架或已删除");
+            throw new ValidationFailureException("产品已下架或已删除");
         }
         ProductDetailVo productDetailVo = assembleProductDetailVo(product);
-        return ServerResponse.successWithData(productDetailVo);
+        return productDetailVo;
     }
 
     @Override
@@ -193,8 +196,7 @@ public class ProductServiceImpl implements IProductService {
         if (categoryId != null) {
             Category category = categoryMapper.selectByPrimaryKey(categoryId);
             if (category == null) {
-                PageHelper pageHelper = new PageHelper();
-                pageHelper.startPage(pageNum, pageSize);
+                PageHelper.startPage(pageNum, pageSize);
                 List<ProductListVo> productListVoList = Lists.newArrayList();
                 PageInfo pageInfo = new PageInfo(productListVoList);
                 return ServerResponse.successWithData(pageInfo);
@@ -204,12 +206,11 @@ public class ProductServiceImpl implements IProductService {
         if (keyword != null) {
             keyword = new StringBuilder().append("%").append(keyword).append("%").toString();
         }
-        PageHelper pageHelper = new PageHelper();
-        pageHelper.startPage(pageNum, pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         if (orderBy != null) {
             if (Constants.orderBySet.contains(orderBy)) {
                 String[] split = orderBy.split("_");
-                pageHelper.orderBy(split[0] + " " + split[1]);
+                PageHelper.orderBy(split[0] + " " + split[1]);
             }
         }
         List<Product> productList = productMapper.selectByNameAndCategoryIdList(keyword == null ? null : keyword,

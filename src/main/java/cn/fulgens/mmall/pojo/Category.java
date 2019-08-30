@@ -14,7 +14,6 @@ import java.util.Objects;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 public class Category {
 
@@ -33,4 +32,14 @@ public class Category {
     private Date createTime;
 
     private Date updateTime;
+
+    public Category(Integer id, Integer parentId, String name, Integer status, Integer sortOrder, Date createTime, Date updateTime) {
+        this.id = id;
+        this.parentId = parentId;
+        this.name = name;
+        this.status = status;
+        this.sortOrder = sortOrder;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
 }
