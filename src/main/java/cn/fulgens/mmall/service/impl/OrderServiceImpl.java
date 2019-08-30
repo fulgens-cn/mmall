@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -564,6 +565,11 @@ public class OrderServiceImpl implements IOrderService {
         String closeTime = time.format(DateTimeFormatter.ofPattern(JodaTimeUtil.STANDARD_PATTERN));
         List<Order> orderList = orderMapper.selectByStatusAndCreateTime(Constants.OrderStatusEnum.NO_PAY.getCode(), closeTime);
         if (CollectionUtils.isEmpty(orderList)) {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return;
         }
         orderList.stream().forEach(order -> {

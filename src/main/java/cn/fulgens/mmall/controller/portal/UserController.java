@@ -3,7 +3,6 @@ package cn.fulgens.mmall.controller.portal;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
 import cn.fulgens.mmall.common.aop.SystemLog;
-import cn.fulgens.mmall.common.exception.ResourceNotFoundException;
 import cn.fulgens.mmall.pojo.User;
 import cn.fulgens.mmall.service.IUserService;
 import cn.fulgens.mmall.common.utils.CookieUtil;

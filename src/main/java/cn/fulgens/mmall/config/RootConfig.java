@@ -19,7 +19,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
         AliPayConfig.class,
         AopConfig.class,
         SessionConfig.class,
-        ScheduleConfig.class
+        ScheduleConfig.class,
+        RedissonConfig.class,
+        CacheConfig.class
 })
 @PropertySource(value = {"classpath:mmall.properties"})
 public class RootConfig {
