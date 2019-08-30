@@ -3,13 +3,10 @@ package cn.fulgens.mmall.service.impl;
 import cn.fulgens.mmall.common.Constants;
 import cn.fulgens.mmall.common.ResponseCode;
 import cn.fulgens.mmall.common.ServerResponse;
+import cn.fulgens.mmall.common.utils.*;
 import cn.fulgens.mmall.mapper.*;
 import cn.fulgens.mmall.pojo.*;
 import cn.fulgens.mmall.service.IOrderService;
-import cn.fulgens.mmall.common.utils.BigDecimalUtil;
-import cn.fulgens.mmall.common.utils.DateTimeUtil;
-import cn.fulgens.mmall.common.utils.FTPUtil;
-import cn.fulgens.mmall.common.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.OrderItemVo;
 import cn.fulgens.mmall.vo.OrderProductVo;
 import cn.fulgens.mmall.vo.OrderVo;
@@ -37,10 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @Transactional
@@ -335,11 +332,11 @@ public class OrderServiceImpl implements IOrderService {
             orderVo.setShippingVo(assembleShippingVo(shipping));
         }
 
-        orderVo.setPaymentTime(DateTimeUtil.dateToStr(order.getPaymentTime()));
-        orderVo.setSendTime(DateTimeUtil.dateToStr(order.getSendTime()));
-        orderVo.setEndTime(DateTimeUtil.dateToStr(order.getEndTime()));
-        orderVo.setCreateTime(DateTimeUtil.dateToStr(order.getCreateTime()));
-        orderVo.setCloseTime(DateTimeUtil.dateToStr(order.getCloseTime()));
+        orderVo.setPaymentTime(JodaTimeUtil.dateToStr(order.getPaymentTime()));
+        orderVo.setSendTime(JodaTimeUtil.dateToStr(order.getSendTime()));
+        orderVo.setEndTime(JodaTimeUtil.dateToStr(order.getEndTime()));
+        orderVo.setCreateTime(JodaTimeUtil.dateToStr(order.getCreateTime()));
+        orderVo.setCloseTime(JodaTimeUtil.dateToStr(order.getCloseTime()));
 
 
         orderVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
@@ -366,7 +363,7 @@ public class OrderServiceImpl implements IOrderService {
         orderItemVo.setQuantity(orderItem.getQuantity());
         orderItemVo.setTotalPrice(orderItem.getTotalPrice());
 
-        orderItemVo.setCreateTime(DateTimeUtil.dateToStr(orderItem.getCreateTime()));
+        orderItemVo.setCreateTime(JodaTimeUtil.dateToStr(orderItem.getCreateTime()));
         return orderItemVo;
     }
 
@@ -531,7 +528,7 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.successWithMsg("支付宝重复调用");
         }
         if(Constants.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS.equals(tradeStatus)){
-            order.setPaymentTime(DateTimeUtil.strToDate(params.get("gmt_payment")));
+            order.setPaymentTime(JodaTimeUtil.strToDate(params.get("gmt_payment")));
             order.setStatus(Constants.OrderStatusEnum.PAID.getCode());
             orderMapper.updateByPrimaryKeySelective(order);
         }
@@ -558,5 +555,28 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.success();
         }
         return ServerResponse.error();
+    }
+
+    @Override
+    public void closeOrder(long timeout, ChronoUnit unit) {
+        // 查询指定时间内未支付订单
+        LocalDateTime time = LocalDateTime.now().minus(timeout, unit);
+        String closeTime = time.format(DateTimeFormatter.ofPattern(JodaTimeUtil.STANDARD_PATTERN));
+        List<Order> orderList = orderMapper.selectByStatusAndCreateTime(Constants.OrderStatusEnum.NO_PAY.getCode(), closeTime);
+        if (CollectionUtils.isEmpty(orderList)) {
+            return;
+        }
+        orderList.stream().forEach(order -> {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+            // 订单项商品库存还原
+            orderItemList.stream().forEach(orderItem -> {
+                productMapper.incrProductStock(orderItem.getQuantity());
+            });
+            // 关闭订单
+            Order updatedOrder = new Order();
+            updatedOrder.setId(order.getId());
+            updatedOrder.setStatus(Constants.OrderStatusEnum.ORDER_CLOSE.getCode());
+            orderMapper.updateByPrimaryKeySelective(updatedOrder);
+        });
     }
 }

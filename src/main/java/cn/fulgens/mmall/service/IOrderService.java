@@ -5,7 +5,9 @@ import cn.fulgens.mmall.vo.OrderProductVo;
 import cn.fulgens.mmall.vo.OrderVo;
 import com.github.pagehelper.PageInfo;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public interface IOrderService {
 
@@ -110,4 +112,12 @@ public interface IOrderService {
      * @return
      */
     ServerResponse<PageInfo> manageSearchOrder(Long orderNo, int pageNum, int pageSize);
+
+    /**
+     * 定时关单
+     *
+     * @param timeout
+     * @param unit
+     */
+    void closeOrder(long timeout, ChronoUnit unit);
 }

@@ -9,7 +9,7 @@ import cn.fulgens.mmall.pojo.Category;
 import cn.fulgens.mmall.pojo.Product;
 import cn.fulgens.mmall.service.ICategoryService;
 import cn.fulgens.mmall.service.IProductService;
-import cn.fulgens.mmall.common.utils.DateTimeUtil;
+import cn.fulgens.mmall.common.utils.JodaTimeUtil;
 import cn.fulgens.mmall.common.utils.PropertiesUtil;
 import cn.fulgens.mmall.vo.ProductDetailVo;
 import cn.fulgens.mmall.vo.ProductListVo;
@@ -119,8 +119,8 @@ public class ProductServiceImpl implements IProductService {
             productDetailVo.setParentCategoryId(category.getParentId());
         }
 
-        productDetailVo.setCreateTime(DateTimeUtil.dateToStr(product.getCreateTime()));
-        productDetailVo.setUpdateTime(DateTimeUtil.dateToStr(product.getUpdateTime()));
+        productDetailVo.setCreateTime(JodaTimeUtil.dateToStr(product.getCreateTime()));
+        productDetailVo.setUpdateTime(JodaTimeUtil.dateToStr(product.getUpdateTime()));
         return productDetailVo;
     }
 

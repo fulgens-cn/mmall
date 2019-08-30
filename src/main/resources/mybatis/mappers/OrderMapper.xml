@@ -241,4 +241,15 @@
     FROM tb_order
     ORDER BY create_time DESC
   </select>
+
+  <select id="selectByStatusAndCreateTime" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM tb_order
+    WHERE `status` = #{status}
+    <![CDATA[
+    AND create_time <= #{time}
+    ]]>
+    ORDER BY create_time DESC
+  </select>
 </mapper>

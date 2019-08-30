@@ -212,4 +212,8 @@
       </if>
     </where>
   </select>
+
+  <update id="incrProductStock" parameterType="int">
+    update tb_product set stock = stock + #{quantity} where status = 1
+  </update>
 </mapper>

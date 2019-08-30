@@ -1,41 +1,143 @@
 package cn.fulgens.mmall.common.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
-* @Author: fulgens
-* @Description: 使用joda-time创建的时间日期转换工具类
-* @Date: Created in 2018/2/6 21:14
-* @Modified by:
-*/
+ * java8 时间工具类
+ *
+ * @author fulgens
+ */
 public class DateTimeUtil {
 
-    public static final String STANDARD_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final DateTimeFormatter DEFAULT_DATETIME_FORMATTER = TimeFormatter.LONG_DATE_PATTERN_LINE.formatter;
 
-    public static Date strToDate(String dateTimeStr, String formatPattern) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(formatPattern);
-        DateTime dateTime = dateTimeFormatter.parseDateTime(dateTimeStr);
-        return dateTime.toDate();
+    private DateTimeUtil() {
     }
 
-    public static Date strToDate(String dateTimeStr) {
-        return strToDate(dateTimeStr, STANDARD_PATTERN);
+    /**
+     * String 转时间
+     *
+     * @param timeStr
+     * @return
+     */
+    public static LocalDateTime parseTime(String timeStr) {
+        return LocalDateTime.parse(timeStr, DEFAULT_DATETIME_FORMATTER);
     }
 
-    public static String dateToStr(Date date, String formatPattern) {
-        if (date == null) {
-            return StringUtils.EMPTY;
+    /**
+     * String 转时间
+     *
+     * @param timeStr
+     * @param format  时间格式
+     * @return
+     */
+    public static LocalDateTime parseTime(String timeStr, TimeFormatter format) {
+        return LocalDateTime.parse(timeStr, format.formatter);
+    }
+
+    /**
+     * 时间转 String
+     *
+     * @param time
+     * @return
+     */
+    public static String parseTime(LocalDateTime time) {
+        return DEFAULT_DATETIME_FORMATTER.format(time);
+    }
+
+    /**
+     * 时间转 String
+     *
+     * @param time
+     * @param format 时间格式
+     * @return
+     */
+    public static String parseTime(LocalDateTime time, TimeFormatter format) {
+        return format.formatter.format(time);
+    }
+
+    /**
+     * 获取当前时间
+     *
+     * @return
+     */
+    public static String getCurrentDatetime() {
+        return DEFAULT_DATETIME_FORMATTER.format(LocalDateTime.now());
+    }
+
+    /**
+     * 获取当前时间
+     *
+     * @param format 时间格式
+     * @return
+     */
+    public static String getCurrentDatetime(TimeFormatter format) {
+        return format.formatter.format(LocalDateTime.now());
+    }
+
+    /**
+     * LocalDateTime转Date
+     *
+     * @param localDateTime
+     * @return
+     */
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+        if (localDateTime == null) {
+            return null;
         }
-        DateTime dateTime = new DateTime(date);
-        return dateTime.toString(formatPattern);
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static String dateToStr(Date date) {
-        return dateToStr(date, STANDARD_PATTERN);
+    /**
+     * Date转LocalDateTime
+     *
+     * @param date
+     * @return
+     */
+    public static LocalDateTime dateToLocalDateTime(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    /**
+     * 时间格式
+     */
+    public enum TimeFormatter {
+
+        /**
+         * 短时间格式
+         */
+        SHORT_DATE_PATTERN_LINE("yyyy-MM-dd"),
+        SHORT_DATE_PATTERN_SLASH("yyyy/MM/dd"),
+        SHORT_DATE_PATTERN_DOUBLE_SLASH("yyyy\\MM\\dd"),
+        SHORT_DATE_PATTERN_NONE("yyyyMMdd"),
+
+        /**
+         * 长时间格式
+         */
+        LONG_DATE_PATTERN_LINE("yyyy-MM-dd HH:mm:ss"),
+        LONG_DATE_PATTERN_SLASH("yyyy/MM/dd HH:mm:ss"),
+        LONG_DATE_PATTERN_DOUBLE_SLASH("yyyy\\MM\\dd HH:mm:ss"),
+        LONG_DATE_PATTERN_NONE("yyyyMMdd HH:mm:ss"),
+
+        /**
+         * 长时间格式 带毫秒
+         */
+        LONG_DATE_PATTERN_WITH_MILSEC_LINE("yyyy-MM-dd HH:mm:ss.SSS"),
+        LONG_DATE_PATTERN_WITH_MILSEC_SLASH("yyyy/MM/dd HH:mm:ss.SSS"),
+        LONG_DATE_PATTERN_WITH_MILSEC_DOUBLE_SLASH("yyyy\\MM\\dd HH:mm:ss.SSS"),
+        LONG_DATE_PATTERN_WITH_MILSEC_NONE("yyyyMMdd HH:mm:ss.SSS");
+
+        private transient DateTimeFormatter formatter;
+
+        TimeFormatter(String pattern) {
+            formatter = DateTimeFormatter.ofPattern(pattern);
+        }
     }
 }
