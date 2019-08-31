@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.*;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,15 +47,29 @@ public class RedisConfig {
     /**************************单机配置 start***************************/
 
     /*@Bean
-    public RedisConnectionFactory redisConnectionFactory(JedisPoolConfig poolConfig) {
-        JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
-        connectionFactory.setHostName(env.getProperty("redis.host"));
-        connectionFactory.setPort(Integer.parseInt(env.getProperty("redis.port")));
-        connectionFactory.setPassword(env.getProperty("redis.password"));
-        connectionFactory.setUseSsl(Boolean.parseBoolean(env.getProperty("redis.ssl")));
-        connectionFactory.setTimeout(Integer.parseInt(env.getProperty("redis.timeout")));
-        connectionFactory.setDatabase(Integer.parseInt(env.getProperty("redis.database")));
-        connectionFactory.setPoolConfig(poolConfig);
+    public RedisStandaloneConfiguration redisStandaloneConfiguration() {
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+        standaloneConfiguration.setHostName(env.getProperty("redis.host"));
+        standaloneConfiguration.setPort(Integer.parseInt(env.getProperty("redis.port")));
+        standaloneConfiguration.setPassword(env.getProperty("redis.password"));
+        standaloneConfiguration.setDatabase(Integer.parseInt(env.getProperty("redis.database")));
+        return standaloneConfiguration;
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory(RedisStandaloneConfiguration standaloneConfiguration,
+                                                         JedisPoolConfig poolConfig) {
+        JedisClientConfiguration.JedisClientConfigurationBuilder clientConfigurationBuilder = JedisClientConfiguration
+                .builder()
+                .usePooling()
+                .poolConfig(poolConfig)
+                .and()
+                .connectTimeout(Duration.ofMillis(Integer.parseInt(env.getProperty("redis.timeout"))));
+        if (Boolean.parseBoolean(env.getProperty("redis.ssl"))) {
+            clientConfigurationBuilder.useSsl();
+        }
+        JedisClientConfiguration clientConfiguration = clientConfigurationBuilder.build();
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory(sentinelConfiguration, clientConfiguration);
         return connectionFactory;
     }*/
 
@@ -77,6 +93,7 @@ public class RedisConfig {
             return new RedisNode(hostAndPort[0], Integer.parseInt(hostAndPort[1]));
         }).collect(Collectors.toSet());
         sentinelConfiguration.setSentinels(sentinelNodes);
+        sentinelConfiguration.setDatabase(Integer.parseInt(env.getProperty("redis.database")));
         return sentinelConfiguration;
     }
 
@@ -89,12 +106,17 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory(RedisSentinelConfiguration sentinelConfiguration,
                                                          JedisPoolConfig poolConfig) {
-        JedisConnectionFactory connectionFactory = new JedisConnectionFactory(sentinelConfiguration, poolConfig);
-        // connectionFactory.setPassword(env.getProperty("redis.password"));
-        connectionFactory.setUseSsl(Boolean.parseBoolean(env.getProperty("redis.ssl")));
-        connectionFactory.setTimeout(Integer.parseInt(env.getProperty("redis.timeout")));
-        connectionFactory.setDatabase(Integer.parseInt(env.getProperty("redis.database")));
-        connectionFactory.setPoolConfig(poolConfig);
+        JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigurationBuilder = JedisClientConfiguration
+                .builder()
+                .usePooling()
+                .poolConfig(poolConfig)
+                .and()
+                .connectTimeout(Duration.ofMillis(Integer.parseInt(env.getProperty("redis.timeout"))));
+        if (Boolean.parseBoolean(env.getProperty("redis.ssl"))) {
+            jedisClientConfigurationBuilder.useSsl();
+        }
+        JedisClientConfiguration clientConfiguration = jedisClientConfigurationBuilder.build();
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory(sentinelConfiguration, clientConfiguration);
         return connectionFactory;
     }
 
@@ -118,8 +140,18 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory(RedisClusterConfiguration clusterConfiguration,
                                                          JedisPoolConfig poolConfig) {
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(clusterConfiguration, poolConfig);
-        return jedisConnectionFactory;
+        JedisClientConfiguration.JedisClientConfigurationBuilder jedisClientConfigurationBuilder = JedisClientConfiguration
+                .builder()
+                .usePooling()
+                .poolConfig(poolConfig)
+                .and()
+                .connectTimeout(Duration.ofMillis(Integer.parseInt(env.getProperty("redis.timeout"))));
+        if (Boolean.parseBoolean(env.getProperty("redis.ssl"))) {
+            jedisClientConfigurationBuilder.useSsl();
+        }
+        JedisClientConfiguration clientConfiguration = jedisClientConfigurationBuilder.build();
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory(clusterConfiguration, clientConfiguration);
+        return connectionFactory;
     }*/
 
     /**************************集群配置 end***************************/
